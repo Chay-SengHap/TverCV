@@ -1,10 +1,8 @@
 import { ArrowRightIcon, CheckIcon, CopyIcon } from "lucide-react";
-import { useState } from "react";
+
 
 export default function HeroSection() {
-    const installCommand = 'npm install prebuiltui@latest';
-    const [isCopied, setIsCopied] = useState(false);
-
+    
     const logos = [
         '/assets/companies-logo/instagram.svg',
         '/assets/companies-logo/framer.svg',
@@ -13,13 +11,7 @@ export default function HeroSection() {
         '/assets/companies-logo/walmart.svg',
     ]
 
-    const handleCopy = () => {
-        setIsCopied(true);
-        navigator.clipboard.writeText(installCommand);
-        setTimeout(() => {
-            setIsCopied(false);
-        }, 3000);
-    }
+   
 
     return (
         <section className="flex flex-col items-center justify-center relative h-svh overflow-hidden">
@@ -78,28 +70,29 @@ export default function HeroSection() {
 
             <h1
                 className="text-4xl md:text-6xl/18 text-center font-semibold max-w-2xl mt-5 bg-gradient-to-r from-black to-[#748298] text-transparent bg-clip-text">
-                Build, Launch & Scale with{" "}
-                <span className="bg-gradient-to-b from-[#e52d27] to-[#b31217] bg-clip-text text-transparent">PrebuiltUI</span>.
+                Land your dream job with{" "}
+                <span className="bg-gradient-to-b from-[#e52d27] to-[#b31217] bg-clip-text text-transparent"> AI-powered </span>resumes.
             </h1>
             <p className="text-slate-600 md:text-base max-md:px-2 text-center max-w-lg mt-3">
-                A high-performance, serverless Postgres database that helps you ship fast and scale without limits.
+                Create, edit and download professional resumes with AI-powered assistance
             </p>
 
-            <button
-                className="flex items-center gap-2 btn hover:opacity-90 text-white px-8 py-3 mt-8 rounded-full transition">
-                <span>get started for free</span>
-                <ArrowRightIcon className='size-5' />
-            </button>
+            <div className="flex gap-5">
 
-            <div className="text-gray-400 bg-gradient-to-b from-indigo-600/50 to-gray-300/50 p-px rounded-[7px] mt-8">
-                <div className="flex items-center gap-2 bg-white rounded-md px-4 py-3">
-                    $ <span>{installCommand}</span>
-                    <button onClick={handleCopy} className="cursor-pointer ml-2">
-                        {isCopied ? <CheckIcon className='size-4' /> : <CopyIcon className='size-4' />}
-                    </button>
-                </div>
+                <button
+                    className="flex items-center gap-2 border-2 border-[#e52d27] text-[#e52d27] hover:opacity-90  px-8 py-3 mt-8 rounded-full transition">
+                    <span>Demo</span>
+                   
+                </button>
+                <button
+                    className="flex items-center gap-2 btn hover:opacity-90 text-white px-8 py-3 mt-8 rounded-full transition">
+                    <span>Get started</span>
+                    <ArrowRightIcon className='size-5' />
+                </button>
             </div>
-            <p className="py-6 text-slate-600 mt-14">Trusting by leading brands, including —</p>
+
+           
+            <p className="py-4 text-slate-600 mt-14">Trusting by leading brands, including —</p>
 
             <div className="flex flex-wrap justify-between max-sm:justify-center gap-10 max-w-4xl w-full mx-auto py-4" id="logo-container">
                 {logos.map((logo, index) => <img key={index} src={logo} alt="logo" className="h-7 w-auto max-w-xs" />)}

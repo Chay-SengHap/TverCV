@@ -5,7 +5,7 @@ export default function WhatWeDoSection() {
         <section className="flex flex-col md:flex-row items-center justify-center gap-20 mt-20">
             <div className="relative shadow-2xl shadow-indigo-600/40 rounded-2xl overflow-hidden shrink-0">
                 <img className="max-w-sm w-full object-cover rounded-2xl"
-                    src="https://images.unsplash.com/photo-1531497865144-0464ef8fb9a9?q=80&w=451&h=451&auto=format&fit=crop"
+                    src="/assets/job.png"
                     alt="" />
                 <div className="flex items-center gap-1 max-w-72 absolute bottom-8 left-8 bg-white p-4 rounded-xl">
                     <div className="flex -space-x-4 shrink-0">
@@ -21,11 +21,11 @@ export default function WhatWeDoSection() {
                             50+
                         </div>
                     </div>
-                    <p className="text-sm font-medium text-slate-800">Join our developer community</p>
+                    <p className="text-sm font-medium text-slate-800">Improve Your CV with TverCV</p>
                 </div>
             </div>
             <div className="text-sm text-slate-600 max-w-md">
-                <h1 className="text-xl uppercase font-semibold text-slate-700">What we do?</h1>
+                <h1 className="text-xl uppercase font-semibold text-slate-700">Build your resume</h1>
                 <div className="w-24 h-[3px] rounded-full bg-gradient-to-r from-indigo-600 to-[#DDD9FF]"></div>
                 <p className="mt-8">PrebuiltUI helps you build faster by transforming your design vision into fully functional,
                     production-ready UI components. </p>
