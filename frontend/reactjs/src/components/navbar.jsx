@@ -62,7 +62,7 @@ export default function Navbar() {
                     ))}
                 </div>
 
-                <Link to='/' className='hidden rounded-full btn px-8 py-2.5 font-medium text-white transition hover:opacity-90 md:inline-block'>
+                <Link to='/signup' className='hidden rounded-full btn px-8 py-2.5 font-medium text-white transition hover:opacity-90 md:inline-block'>
                     Sign Up
                 </Link>
 

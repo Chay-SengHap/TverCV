@@ -1,29 +1,25 @@
-import Banner from "./components/banner";
-import LenisScroll from "./components/lenis-scroll";
-import Navbar from "./components/navbar";
-import Footer from "./components/footer";
-import HeroSection from "./sections/hero-section";
-import WhatWeDoSection from "./sections/what-we-do-section";
-import OurLatestCreations from "./sections/our-latest-creations";
-import OurTestimonialSection from "./sections/our-testimonials-section";
-import FaqSection from "./sections/faq-section";
-import Newsletter from "./sections/newsletter";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Homepage from "./pages/Homepage";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { DashBoard } from "./pages/DashBoard";
 
 export default function App() {
     return (
         <>
-            <LenisScroll />
-            <Banner />
-            <Navbar />
-            <main className='px-4'>
-                <HeroSection />
-                <WhatWeDoSection />
-                <OurLatestCreations />
-                <OurTestimonialSection />
-                <FaqSection />
-                <Newsletter />
-            </main>
-            <Footer />
+
+            <Routes>
+
+                <Route path="/" element={<Homepage />} />
+
+                <Route path="/login" element={<Login />} />
+
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/dashboard" element={<DashBoard />} />
+
+            </Routes>
+
+        
         </>
     );
 }
