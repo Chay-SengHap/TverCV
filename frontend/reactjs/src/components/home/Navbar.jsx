@@ -62,8 +62,8 @@ export default function Navbar() {
                     ))}
                 </div>
 
-                <Link to='/' className='hidden rounded-full btn px-8 py-2.5 font-medium text-white transition hover:opacity-90 md:inline-block'>
-                    Sign Up
+                <Link to='/app?state=login' className='hidden rounded-full btn px-8 py-2.5 font-medium text-white transition hover:opacity-90 md:inline-block'>
+                    Login
                 </Link>
 
                 <button onClick={() => setIsOpen(true)} className='transition active:scale-90 md:hidden'>
@@ -99,7 +99,7 @@ export default function Navbar() {
                 ))}
 
                 <Link to='/' className='rounded-full btn px-8 py-2.5 font-medium text-white transition hover:opacity-90' onClick={() => setIsOpen(false)}>
-                    Sign Up
+                    Login
                 </Link>
 
                 <button onClick={() => setIsOpen(false)} className='rounded-md btn p-2 text-white ring-white active:ring-2'>

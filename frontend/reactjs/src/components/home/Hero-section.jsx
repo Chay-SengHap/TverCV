@@ -1,4 +1,5 @@
 import { ArrowRightIcon, CheckIcon, CopyIcon } from "lucide-react";
+import { Link } from "react-router-dom";
 
 
 export default function HeroSection() {
@@ -32,7 +33,7 @@ export default function HeroSection() {
                         <feFlood floodOpacity="0" result="BackgroundImageFix" />
                         <feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
                         <feGaussianBlur stdDeviation="150.05" result="effect1_foregroundBlur_8119_961" />
-                        <feTurbulence type="fractalNoise" baseFrequency="inf inf" stitchTiles="stitch" numOctaves="3" result="noise" seed="9943" />
+                        <feTurbulence type="fractalNoise" baseFrequency="0.65 0.65" stitchTiles="stitch" numOctaves="3" result="noise" seed="9943" />
                         <feColorMatrix in="noise" type="luminanceToAlpha" result="alphaNoise" />
                         <feComponentTransfer in="alphaNoise" result="coloredNoise1">
                             <feFuncA type="discrete" tableValues="1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" />
@@ -84,11 +85,13 @@ export default function HeroSection() {
                     <span>Demo</span>
                    
                 </button>
-                <button
-                    className="flex items-center gap-2 btn hover:opacity-90 text-white px-8 py-3 mt-8 rounded-full transition">
-                    <span>Get started</span>
-                    <ArrowRightIcon className='size-5' />
-                </button>
+                <Link to='/app?state=register'>
+                    <button
+                        className="flex items-center gap-2 btn hover:opacity-90 text-white px-8 py-3 mt-8 rounded-full transition">
+                        <span>Get started</span>
+                        <ArrowRightIcon className='size-5' />
+                    </button>
+                </Link>
             </div>
 
            

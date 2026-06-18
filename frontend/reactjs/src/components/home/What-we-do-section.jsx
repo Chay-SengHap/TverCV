@@ -17,7 +17,7 @@ export default function WhatWeDoSection() {
                             alt="image"
                             className="size-9 rounded-full border-[3px] border-white hover:-translate-y-1 transition z-[3]" />
                         <div
-                            className="flex items-center justify-center text-xs  text-white size-9 rounded-full border-[3px] border-white bg-indigo-600 hover:-translate-y-1 transition z-[4]">
+                            className="flex items-center justify-center text-xs  text-white size-9 rounded-full border-[3px] border-white bg-red-600 hover:-translate-y-1 transition z-[4]">
                             50+
                         </div>
                     </div>
@@ -26,7 +26,7 @@ export default function WhatWeDoSection() {
             </div>
             <div className="text-sm text-slate-600 max-w-md">
                 <h1 className="text-xl uppercase font-semibold text-slate-700">Build your resume</h1>
-                <div className="w-24 h-[3px] rounded-full bg-gradient-to-r from-indigo-600 to-[#DDD9FF]"></div>
+                <div className="w-24 h-[3px] rounded-full bg-gradient-to-r from-red-600 to-[#ffd9d9]"></div>
                 <p className="mt-8">PrebuiltUI helps you build faster by transforming your design vision into fully functional,
                     production-ready UI components. </p>
                 <p className="mt-4">Whether you're launching a SaaS app, landing page, or dashboard, our collection of Tailwind
