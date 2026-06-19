@@ -4,7 +4,7 @@
 // -  Perfrom the SQL querries to implement the bellow API
 //
 
-import { pool } from "../db/database.js";
+import { pool } from "../db/databaseRepo.js";
 
 // Get all users
 export async function getUsers() {
