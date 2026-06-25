@@ -8,7 +8,7 @@ const __dirname = dirname(__filename);
 
 dotenv.config({ path: resolve(__dirname, "../.env") });
 
-const sequelize = new Sequelize(
+export const sequelize = new Sequelize(
     process.env.DB_NAME,
     process.env.DB_USER,
     process.env.DB_PASSWORD,
@@ -20,4 +20,4 @@ const sequelize = new Sequelize(
     }
 );
 
-export default sequelize;
+ console.log("DB URL:", JSON.stringify(process.env.DB_HOST))

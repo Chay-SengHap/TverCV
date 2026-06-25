@@ -1,11 +1,23 @@
+import User from "../model/User.js";
+import {Resume} from "../model/Resume.js";
 import * as userRepository from "../repositories/sqlUserRepository.js";
+import jwt from 'jsonwebtoken'
+import { where } from "sequelize";
 
+const generateToken = (userId)=>{
+  const token = jwt.sign({userId} , process.env.JWT_SECRET , {expiresIn : '7d'})
+
+  return token
+}  
 
 
 // GET /api/user
 export async function getAllUsers(req, res) {
   try {
     const users = await userRepository.getUsers();
+    if(!users){
+      return res.status()
+    }
     res.json(users);
   } catch (error) {
     console.error("Error fetching users:", error);
@@ -16,10 +28,17 @@ export async function getAllUsers(req, res) {
 // GET /api/users/:id
 export async function getUserById(req, res) {
   try {
-    const user = await userRepository.getUserById(req.params.id);
+    const id = req.userId;
+    
+    const user = await User.findOne({
+      where: { id: id }
+    });
+    
     if (!user) {
       return res.status(404).json({ message: "user not found" });
     }
+    
+    user.password_hash = undefined;
     res.json(user);
   } catch (error) {
     console.error("Error fetching user:", error);
@@ -65,3 +84,62 @@ export async function deleteUser(req, res) {
     res.status(500).json({ message: "Server error" });
   }
 }
+
+export async function loginUser(req, res) {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
+    }
+
+    const user = await userRepository.loginUser({ email, password });
+
+    const token = generateToken(user.id);
+    user.password_hash = undefined
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        password_hash : user.password_hash,
+        role: user.role
+      }
+    });
+
+  } catch (error) {
+    console.error("Error logging in user:", error);
+    
+    const statusCode = error.statusCode || 500;
+    const message = error.statusCode ? error.message : "Server error";
+    
+    res.status(statusCode).json({ message });
+  }
+}
+
+// controller getting resume
+// Get /api/users/resumes
+
+export const getUserResumes = async (req, res)=>{
+  try {
+    const userId = req.userId
+
+    const resumes = await Resume.findAll({
+      where : {
+        user_id : userId
+      }
+    })
+
+    return res.status(200).json(resumes)
+
+  } catch (error) {
+    return res.status(400).json({
+      message : error.message
+    })
+  }
+}
+
+
+
