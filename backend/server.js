@@ -1,9 +1,10 @@
 import express from "express";
 import cors from 'cors'
 import "dotenv/config"
-import { pool } from "./db/database.js";
+import { sequelize } from "./db/database.js";
 import bcrypt from 'bcrypt';
 import userRouter from "./routes/userRoute.js";
+import { resumeRouter } from "./routes/resumeRoute.js";
 
 const app = express()
 
@@ -87,12 +88,14 @@ app.post('/login' , async(req , res)=>{
 
 
 app.use('/api/users', userRouter);
+app.use('/api/resumes', resumeRouter);
+
 
 
 app.listen(PORT , ()=>{
     // console.log(`Server Running on ${PORT}`)
     console.log(`Server running on http://localhost:${PORT}`);
-    console.log("DB URL:", JSON.stringify(process.env.DATABASE_URL));
+
     
 })
 
