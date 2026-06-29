@@ -47,14 +47,26 @@ export async function getUserById(req, res) {
 }
 
 // POST /api/users
+// POST /api/users/register (or /api/users)
 export async function createUser(req, res) {
-  try {
-    const newUser = await userRepository.createUser(req.body);
-    res.status(201).json(newUser);
-  } catch (error) {
-    console.error("Error creating user:", error);
-    res.status(500).json({ message: "Server error" });
-  }
+    try {
+        const newUser = await userRepository.createUser(req.body);
+        const token = generateToken(newUser.id);
+        
+        const userData = newUser.toJSON ? newUser.toJSON() : newUser;
+        delete userData.password_hash;
+
+        return res.status(201).json({
+            message: "Registration successful",
+            token,
+            user: userData
+        });
+    } catch (error) {
+        console.error("Error creating user:", error);
+        const statusCode = error.statusCode || 500;
+        const message = error.statusCode ? error.message : "Server error";
+        return res.status(statusCode).json({ message });
+    }
 }
 
 // PUT /api/users/:id
@@ -86,37 +98,32 @@ export async function deleteUser(req, res) {
 }
 
 export async function loginUser(req, res) {
-  try {
-    const { email, password } = req.body;
+    try {
+        const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
+        if (!email || !password) {
+            return res.status(400).json({ message: "Email and password are required" });
+        }
+
+        const userInstance = await userRepository.loginUser({ email, password });
+        const token = generateToken(userInstance.id);
+        
+        // Convert clean JSON structure and strip tracking metadata safely
+        const userData = userInstance.toJSON ? userInstance.toJSON() : userInstance;
+        delete userData.password_hash;
+
+        return res.status(200).json({
+            message: "Login successful",
+            token,
+            user: userData
+        });
+
+    } catch (error) {
+        console.error("Error logging in user:", error);
+        const statusCode = error.statusCode || 500;
+        const message = error.statusCode ? error.message : "Server error";
+        return res.status(statusCode).json({ message });
     }
-
-    const user = await userRepository.loginUser({ email, password });
-
-    const token = generateToken(user.id);
-    user.password_hash = undefined
-    res.status(200).json({
-      message: "Login successful",
-      token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        password_hash : user.password_hash,
-        role: user.role
-      }
-    });
-
-  } catch (error) {
-    console.error("Error logging in user:", error);
-    
-    const statusCode = error.statusCode || 500;
-    const message = error.statusCode ? error.message : "Server error";
-    
-    res.status(statusCode).json({ message });
-  }
 }
 
 // controller getting resume
@@ -132,7 +139,7 @@ export const getUserResumes = async (req, res)=>{
       }
     })
 
-    return res.status(200).json(resumes)
+    return res.status(200).json({resumes})
 
   } catch (error) {
     return res.status(400).json({

@@ -9,26 +9,28 @@ import {PersonalInfo} from "../model/Personal_info.js"
 
 
 // Post : /api/resumes/create
-export const createResume = async (req, res)=>{
+export const createResume = async (req, res) => {
     try {
-        const userId = req.userId
-        const {title} = req.body
+        const userId = req.userId; // Extracted from your working protect middleware
+        const { title } = req.body;
 
-        // create new resume
-
-        const newResume = await Resume.create({userId , title})
+        // FIXED: Map JavaScript's userId directly to your model's user_id column
+        const newResume = await Resume.create({
+            user_id: userId, 
+            title
+        });
 
         return res.status(201).json({
-            message : "resume created successfully",
-            resume : newResume
-        })
+            message: "Resume created successfully",
+            resume: newResume
+        });
 
     } catch (error) {
-         return res.status(400).json({
-      message : error.message
-    })
+        return res.status(400).json({
+            message: error.message
+        });
     }
-}
+};
 // Delete : /api/resumes/delete
 export const deleteResume = async (req, res)=>{
     try {

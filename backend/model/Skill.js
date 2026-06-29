@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
-import sequelize from "../db/database.js";
+import {sequelize} from "../db/database.js";
 
-const Skill = sequelize.define(
+export const Skill = sequelize.define(
     "Skill",
     {
         id: {
@@ -27,4 +27,3 @@ const Skill = sequelize.define(
     }
 );
 
-export default Skill;

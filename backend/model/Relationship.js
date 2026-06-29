@@ -1,10 +1,10 @@
 import User from "./User.js";
-import Resume from "./Resume.js";
-import PersonalInfo from "./Personal_info.js";
-import Experience from "./Experience.js";
-import Education from "./Education.js";
-import Project from "./Project.js";
-import Skill from "./Skill.js";
+import {Resume} from "./Resume.js";
+import {PersonalInfo} from "./Personal_info.js";
+import {Experience} from "./Experience.js";
+import {Education} from "./Education.js";
+import {Project} from "./Project.js";
+import {Skill} from "./Skill.js";
 
 // User to Resumes (one-to-many)
 User.hasMany(Resume, { foreignKey: "user_id", onDelete: "CASCADE" });

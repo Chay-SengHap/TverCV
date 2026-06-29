@@ -1,4 +1,4 @@
-import sequelize from "../db/database.js";
+import {sequelize} from "../db/database.js";
 
 async function testConnection() {
     try {

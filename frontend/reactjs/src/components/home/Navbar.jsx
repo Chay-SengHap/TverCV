@@ -8,16 +8,6 @@ export default function Navbar() {
 
     const links = [
         { name: 'Home', href: '/' },
-        {
-            name: 'Products',
-            subLinks: [
-                { name: 'Text to Slides', href: '/products/text-to-slides', icon: FileTextIcon, description: 'Convert text to slides' },
-                { name: 'Image to Slides', href: '/products/image-to-slides', icon: ImageUpIcon, description: 'Convert images to slides' },
-                { name: 'Video to Slides', href: '/products/video-to-slides', icon: FileVideo, description: 'Convert videos to slides' },
-                { name: 'Audio to Slides', href: '/products/audio-to-slides', icon: AudioLines, description: 'Convert audio to slides' },
-                { name: 'Ideas to Slides', href: '/products/ideas-to-slides', icon: LightbulbIcon, description: 'Generate slides from ideas' },
-            ],
-        },
         { name: 'Stories', href: '/stories' },
         { name: 'Pricing', href: '#pricing' },
         { name: 'Docs', href: '/docs' },
@@ -25,7 +15,7 @@ export default function Navbar() {
 
     return (
         <>
-            <nav className='sticky top-0 z-50 flex w-full items-center justify-between bg-white/50 px-4 py-3.5 backdrop-blur-md md:px-16 lg:px-24'>
+            <nav className='sticky top-0 z-50 flex w-full items-center justify-between bg-white/50 px-4 py-3.5 backdrop-blur-md md:px-8 lg:px-16'>
                 <a href='https://prebuiltui.com?utm_source=material'>
                     <img src='/assets/logoTverCv.png' alt='logo' className='h-8.5 w-auto' width={205} height={48} />
                 </a>
@@ -61,10 +51,16 @@ export default function Navbar() {
                         </Link>
                     ))}
                 </div>
-
-                <Link to='/app?state=login' className='hidden rounded-full btn px-8 py-2.5 font-medium text-white transition hover:opacity-90 md:inline-block'>
-                    Login
-                </Link>
+                <div className='hidden items-center gap-3 md:flex'>
+                    <Link to='/app?state=register' className='hidden rounded-full btn px-6 py-2 font-medium text-white transition hover:opacity-90 md:inline-block'>
+                        Get Start
+                    </Link>
+                    <Link to='/app?state=login' className='hidden rounded-full border-2 px-6 py-2 font-medium text-red-500 transition hover:opacity-90 md:inline-block'>
+                        Login
+                    </Link>
+                </div>
+                
+                
 
                 <button onClick={() => setIsOpen(true)} className='transition active:scale-90 md:hidden'>
                     <MenuIcon className='size-6.5' />

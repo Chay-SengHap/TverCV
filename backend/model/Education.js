@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
-import sequelize from "../db/database.js";
+import {sequelize} from "../db/database.js";
 
-const Education = sequelize.define(
+export const Education = sequelize.define(
     "Education",
     {
         id: {
@@ -40,4 +40,3 @@ const Education = sequelize.define(
     }
 );
 
-export default Education;

@@ -2,9 +2,14 @@ import { FilePenLineIcon, PencilIcon, PlusIcon, TrashIcon, UploadCloud, UploadCl
 import React, { useEffect, useState } from 'react'
 import { dummyResumeData } from '../assets/assets';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import api from '../config/api';
+import toast from 'react-hot-toast';
+import pdfToText from 'react-pdftotext';
 
 const Dashboard = () => {
 
+  const {user , token} = useSelector(state => state.auth)
   const colors = ["#9333ea", "#d97706", "#dc2626", "#0284c7", "#16a34a"];
   const [allResumes, setAllResumes] = useState([]);
   const [showCreateResume, setShowCreateResume] = useState(false);
@@ -12,24 +17,76 @@ const Dashboard = () => {
   const [title, setTitle] = useState('');
   const [resume, setResume] = useState(null);
   const [editResumeId, setEditResumeId] = useState('');
-
+  const [isLoading , setIsLoading] = useState(false)
   const navigate = useNavigate();
 
   const loadAllResumes = async () => {
-    setAllResumes(dummyResumeData)
+   try {
+    const {data} = await api.get('/api/users/resumes' , {headers : {
+      Authorization : `Bearer ${token}`
+    }})
+    setAllResumes(data.resumes)
+   } catch (error) {
+    toast.error(error?.response?.data?.message)
+   }
   }
 
   const createResme = async (event) => {
-    event.preventDefault();
-    setShowCreateResume(false);
-    navigate(`/app/builder/res123`);
+    try {
+      event.preventDefault()
+      const {data} = await api.post('/api/resumes/create' , {title} , {headers : {
+        Authorization : `Bearer ${token}`
+      }})
+      
+      setAllResumes([...allResumes , data.resume])
+      setTitle('')
+      setShowCreateResume(false)
+      navigate(`/app/builder/${data.resumeId}`)
+      toast.success(data.message)
+    } catch (error) {
+      toast.error(error?.response?.data?.message)
+    }
   }
 
   const uploadResume = async (event) => {
-    event.preventDefault();
+  event.preventDefault();
+  setIsLoading(true);
+  try {
+    const resumeText = await pdfToText(resume);
+    
+    // FIX: Check if the text extraction actually worked before hitting the backend
+    if (!resumeText || resumeText.trim() === "") {
+      toast.error("Could not read any text from this PDF. Please make sure it is not a scanned image file.");
+      setIsLoading(false);
+      return;
+    }
+
+    const { data } = await api.post(
+      '/api/ai/upload-resume', 
+      { resumeText, title }, 
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    setTitle('');
+    setResume(null);
     setShowUploadResume(false);
-    navigate('/app/builder/res123');
+    
+    if (data && data.resumeId) {
+      toast.success("Resume parsed and uploaded successfully!");
+      navigate(`/app/builder/${data.resumeId}`);
+    }
+
+  } catch (error) {
+    console.error(error);
+    toast.error(error?.response?.data?.message || "Failed to upload resume");
+  } finally {
+    setIsLoading(false);
   }
+};
   
   const editTitle =async (event) => {
     event.preventDefault();
@@ -51,7 +108,7 @@ const Dashboard = () => {
     <div>
       <div className=' max-w-7xl mx-auto px-4 py-8'>
 
-        <p className=' text-2xl font-medium mb-6 bg-gradient-to-r from-slate-600 to-slate-700 bg-clip-text text-transparent sm:hidden'>Welcome, Jonh Doe</p>
+        <p className=' text-2xl font-medium mb-6 bg-gradient-to-r from-slate-600 to-slate-700 bg-clip-text text-transparent sm:hidden'>Welcome, {user?.name}</p>
 
 
         <div className='flex gap-4'>

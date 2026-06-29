@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
-import sequelize from "../db/database.js";
+import {sequelize} from "../db/database.js";
 
-const Project = sequelize.define(
+export const Project = sequelize.define(
     "Project",
     {
         id: {
@@ -34,4 +34,3 @@ const Project = sequelize.define(
     }
 );
 
-export default Project;

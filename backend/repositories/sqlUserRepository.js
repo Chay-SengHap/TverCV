@@ -38,24 +38,27 @@ export async function getUserById(id) {
 
 
 // Create a new user
+// Create a new user
+// Inside backend/repositories/sqlUserRepository.js
 export async function createUser(newUserData) {
-    
     try {
         const userExist = await User.findOne({
-            where : {email : newUserData.email}
-        })
+            where: { email: newUserData.email }
+        });
 
-        if(userExist){
+        if (userExist) {
             const error = new Error("User already exists with this email");
             error.statusCode = 400;
             throw error;
         }
-        const newUser = await User.create(newUserData)
-        const token = generateToken(newUser.id)
-        newUser.password_hash = undefined
-        return newUser
+
+        // Pass the entire newUserData (which contains the plain password field)
+        // directly into Sequelize so the virtual field can catch it.
+        const newUser = await User.create(newUserData);
+        return newUser;
     } catch (error) {
-        console.error(error);
+        console.error("Repository error:", error);
+        throw error;
     }
 }
 
@@ -84,7 +87,8 @@ export async function deleteUser(id) {
 export async function loginUser({ email, password }) {
     try {
         const user = await User.findOne({
-            where: { email: email }
+            where: { email: email },
+            attributes: ["id", "name", "email", "password_hash", "role"] // Forces loading the hash
         });
 
         if (!user) {
@@ -94,7 +98,6 @@ export async function loginUser({ email, password }) {
         }
 
         const isMatch = await user.comparePassword(password);
-        
         if (!isMatch) {
             const error = new Error("Invalid email or password");
             error.statusCode = 401;

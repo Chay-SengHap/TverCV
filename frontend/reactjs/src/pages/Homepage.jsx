@@ -1,4 +1,4 @@
-import Banner from "../components/banner";
+import Banner from "../components/Banner";
 import LenisScroll from "../components/lenis-scroll";
 import Navbar from "../components/navbar";
 import Footer from "../components/footer";
@@ -13,7 +13,7 @@ export default function Homepage() {
     return (
         <>
             <LenisScroll />
-            <Banner />
+          
             <Navbar />
             <main className='px-4'>
                 <HeroSection />

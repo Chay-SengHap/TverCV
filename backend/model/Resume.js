@@ -19,10 +19,12 @@ export const Resume = sequelize.define(
         },
         is_public: {
             type: DataTypes.BOOLEAN,
+            defaultValue : false
         },
         public_slug: {
             type: DataTypes.STRING(100),
             unique: true,
+            
         },
         template: {
             type: DataTypes.STRING(100),

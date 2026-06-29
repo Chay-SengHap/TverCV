@@ -13,7 +13,6 @@ const Home = () => {
   return (
     <div>
       <main className='px-4'>
-        <Banner />
         <Navbar />
         <HeroSection />
         <WhatWeDoSection />

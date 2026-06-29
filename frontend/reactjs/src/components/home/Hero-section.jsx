@@ -1,9 +1,14 @@
 import { ArrowRightIcon, CheckIcon, CopyIcon } from "lucide-react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 
 export default function HeroSection() {
     
+    const {user} = useSelector (state => state.auth)
+
+
+
     const logos = [
         '/assets/companies-logo/instagram.svg',
         '/assets/companies-logo/framer.svg',
@@ -85,12 +90,13 @@ export default function HeroSection() {
                     <span>Demo</span>
                    
                 </button>
-                <Link to='/app?state=register'>
-                    <button
-                        className="flex items-center gap-2 btn hover:opacity-90 text-white px-8 py-3 mt-8 rounded-full transition">
-                        <span>Get started</span>
+                <Link to='/app?state=register' className="flex items-center gap-2 btn hover:opacity-90 text-white px-8 py-3 mt-8 rounded-full transition" hidden={user}>
+                        Get started
                         <ArrowRightIcon className='size-5' />
-                    </button>
+                  
+                </Link>
+                <Link to='/app' className="flex items-center gap-2 btn hover:opacity-90 text-white px-8 py-3 mt-8 rounded-full transition" hidden={!user}>
+                    Dashboard
                 </Link>
             </div>
 
