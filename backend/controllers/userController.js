@@ -4,19 +4,18 @@ import * as userRepository from "../repositories/sqlUserRepository.js";
 import jwt from 'jsonwebtoken'
 import { where } from "sequelize";
 
-const generateToken = (userId)=>{
-  const token = jwt.sign({userId} , process.env.JWT_SECRET , {expiresIn : '7d'})
-  
+
+const generateToken = (userId) => {
+  const token = jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '7d' })
   return token
-}  
+}
 
-
-// GET /api/user
+// GET /api/users
 export async function getAllUsers(req, res) {
   try {
     const users = await userRepository.getUsers();
-    if(!users){
-      return res.status()
+    if (!users) {
+      return res.status(404).json({ message: "No users found" });
     }
     res.json(users);
   } catch (error) {
@@ -29,17 +28,17 @@ export async function getAllUsers(req, res) {
 export async function getUserById(req, res) {
   try {
     const id = req.userId;
-    
-    const user = await User.findOne({
-      where: { id: id }
-    });
-    
+
+    const user = await userRepository.getUserById(id);
+
     if (!user) {
       return res.status(404).json({ message: "user not found" });
     }
-    
-    user.password_hash = undefined;
-    res.json(user);
+
+    const userData = user.toJSON ? user.toJSON() : user;
+    delete userData.password_hash;
+
+    res.json(userData);
   } catch (error) {
     console.error("Error fetching user:", error);
     res.status(500).json({ message: "Server error" });
@@ -49,37 +48,42 @@ export async function getUserById(req, res) {
 // POST /api/users
 // POST /api/users/register (or /api/users)
 export async function createUser(req, res) {
-    try {
-        const newUser = await userRepository.createUser(req.body);
-        const token = generateToken(newUser.id);
-        
-        const userData = newUser.toJSON ? newUser.toJSON() : newUser;
-        delete userData.password_hash;
+  try {
+    const newUser = await userRepository.createUser(req.body);
+    const token = generateToken(newUser.id);
 
-        return res.status(201).json({
-            message: "Registration successful",
-            token,
-            user: userData
-        });
-    } catch (error) {
-        console.error("Error creating user:", error);
-        const statusCode = error.statusCode || 500;
-        const message = error.statusCode ? error.message : "Server error";
-        return res.status(statusCode).json({ message });
-    }
+    const userData = newUser.toJSON ? newUser.toJSON() : newUser;
+    delete userData.password_hash;
+
+    return res.status(201).json({
+      message: "Registration successful",
+      token,
+      user: userData
+    });
+  } catch (error) {
+    console.error("Error creating user:", error);
+    const statusCode = error.statusCode || 500;
+    const message = error.statusCode ? error.message : "Server error";
+    return res.status(statusCode).json({ message });
+  }
 }
 
 // PUT /api/users/:id
 export async function updateUser(req, res) {
   try {
-    const updateduser = await userRepository.updateUser(
+    const updatedUser = await userRepository.updateUser(
       req.params.id,
       req.body
     );
+
     if (!updatedUser) {
       return res.status(404).json({ message: "user not found" });
     }
-    res.json(updatedUser);
+
+    const userData = updatedUser.toJSON ? updatedUser.toJSON() : updatedUser;
+    delete userData.password_hash;
+
+    res.json(userData);
   } catch (error) {
     console.error("Error updating user:", error);
     res.status(500).json({ message: "Server error" });
@@ -89,7 +93,12 @@ export async function updateUser(req, res) {
 // DELETE /api/users/:id
 export async function deleteUser(req, res) {
   try {
-    await userRepository.deleteUser(req.params.id);
+    const deletedRows = await userRepository.deleteUser(req.params.id);
+
+    if (!deletedRows) {
+      return res.status(404).json({ message: "user not found" });
+    }
+
     res.status(204).send();
   } catch (error) {
     console.error("Error deleting user:", error);
@@ -97,56 +106,51 @@ export async function deleteUser(req, res) {
   }
 }
 
+// POST /api/users/login
 export async function loginUser(req, res) {
-    try {
-        const { email, password } = req.body;
-
-        if (!email || !password) {
-            return res.status(400).json({ message: "Email and password are required" });
-        }
-
-        const userInstance = await userRepository.loginUser({ email, password });
-        const token = generateToken(userInstance.id);
-        
-        // Convert clean JSON structure and strip tracking metadata safely
-        const userData = userInstance.toJSON ? userInstance.toJSON() : userInstance;
-        delete userData.password_hash;
-
-        return res.status(200).json({
-            message: "Login successful",
-            token,
-            user: userData
-        });
-
-    } catch (error) {
-        console.error("Error logging in user:", error);
-        const statusCode = error.statusCode || 500;
-        const message = error.statusCode ? error.message : "Server error";
-        return res.status(statusCode).json({ message });
-    }
-}
-
-// controller getting resume
-// Get /api/users/resumes
-
-export const getUserResumes = async (req, res)=>{
   try {
-    const userId = req.userId
+    const { email, password } = req.body;
 
-    const resumes = await Resume.findAll({
-      where : {
-        user_id : userId
-      }
-    })
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
+    }
 
-    return res.status(200).json({resumes})
+    const userInstance = await userRepository.loginUser({ email, password });
+    const token = generateToken(userInstance.id);
+
+    const userData = userInstance.toJSON ? userInstance.toJSON() : userInstance;
+    delete userData.password_hash;
+
+    return res.status(200).json({
+      message: "Login successful",
+      token,
+      user: userData
+    });
 
   } catch (error) {
-    return res.status(400).json({
-      message : error.message
-    })
+    console.error("Error logging in user:", error);
+    const statusCode = error.statusCode || 500;
+    const message = error.statusCode ? error.message : "Server error";
+    return res.status(statusCode).json({ message });
   }
 }
 
+// GET /api/users/resumes
+export const getUserResumes = async (req, res) => {
+  try {
+    const userId = req.userId;
 
+    const resumes = await Resume.findAll({
+      where: {
+        user_id: userId
+      }
+    });
 
+    return res.status(200).json({ resumes });
+
+  } catch (error) {
+    return res.status(400).json({
+      message: error.message
+    });
+  }
+}
