@@ -6,8 +6,6 @@ import fs from 'fs'
 import {PersonalInfo} from "../model/Personal_info.js"
 
 // controller for creating new resume
-
-
 // Post : /api/resumes/create
 export const createResume = async (req, res) => {
     try {
@@ -127,14 +125,17 @@ export const getPublicResumeById = async (req, res)=>{
 // Put : /api/resume/update
 export const updateResume = async (req, res) => {
     try {
-        const userId = req.userId; // user_id from auth token
+        const userId = req.userId;
         const { resumeId, resumeData, removeBackground } = req.body;
         const image = req.file;
 
-        // 1. CRITICAL FIX: Parse the string into an object FIRST before you read or modify it!
-        let resumeDataCopy = JSON.parse(resumeData);
+        let resumeDataCopy;
+        if (typeof resumeData === 'string') {
+            resumeDataCopy = JSON.parse(resumeData);
+        } else {
+            resumeDataCopy = resumeData || {};
+        }
 
-        // 2. Handle image upload if a file exists
         if (image) {
             const imageBufferData = fs.createReadStream(image.path);
             const response = await imageKit.files.upload({
@@ -146,29 +147,31 @@ export const updateResume = async (req, res) => {
                 }
             });
             
-            // Clean up the temporary file from your local disk
             fs.unlinkSync(image.path);
 
-            // Assign the uploaded URL directly to the personal_info block
             if (!resumeDataCopy.personal_info) resumeDataCopy.personal_info = {};
             resumeDataCopy.personal_info.image_url = response.url;
         }
 
-        // 3. Update the main Resume table
+        // 🛟 FIX: Build a clean update object containing ONLY defined values
+        const updateFields = {};
+        if (resumeDataCopy.title !== undefined) updateFields.title = resumeDataCopy.title;
+        if (resumeDataCopy.is_public !== undefined) updateFields.is_public = resumeDataCopy.is_public;
+        if (resumeDataCopy.public_slug !== undefined) updateFields.public_slug = resumeDataCopy.public_slug;
+        if (resumeDataCopy.template !== undefined) updateFields.template = resumeDataCopy.template;
+        if (resumeDataCopy.accent_color !== undefined) updateFields.accent_color = resumeDataCopy.accent_color;
+        if (resumeDataCopy.professional_summary !== undefined) updateFields.professional_summary = resumeDataCopy.professional_summary;
+        
+        // Always update the timestamp
+        updateFields.updated_at = new Date();
+
+        // 3. Update the main Resume table using only the explicit changes
         const [affectedRows] = await Resume.update(
-            {
-                title: resumeDataCopy.title,
-                is_public: resumeDataCopy.is_public,
-                public_slug: resumeDataCopy.public_slug,
-                template: resumeDataCopy.template,
-                accent_color: resumeDataCopy.accent_color,
-                professional_summary: resumeDataCopy.professional_summary,
-                updated_at: new Date() // Manual update since timestamps: false
-            },
+            updateFields, // No more passing undefined/null properties blindly!
             {
                 where: {
                     id: resumeId,
-                    user_id: userId // Your model uses snake_case 'user_id'
+                    user_id: userId 
                 }
             }
         );
@@ -179,31 +182,34 @@ export const updateResume = async (req, res) => {
             });
         }
 
-        // 4. Update the Personal Info table if personal info data was sent
+        // 4. Update the Personal Info table safely if it was explicitly sent
         if (resumeDataCopy.personal_info) {
+            const personalInfoFields = {};
+            const pi = resumeDataCopy.personal_info;
+            
+            if (pi.full_name !== undefined) personalInfoFields.full_name = pi.full_name;
+            if (pi.profession !== undefined) personalInfoFields.profession = pi.profession;
+            if (pi.email !== undefined) personalInfoFields.email = pi.email;
+            if (pi.phone !== undefined) personalInfoFields.phone = pi.phone;
+            if (pi.location !== undefined) personalInfoFields.location = pi.location;
+            if (pi.linkedin !== undefined) personalInfoFields.linkedin = pi.linkedin;
+            if (pi.website !== undefined) personalInfoFields.website = pi.website;
+            if (pi.image_url !== undefined) personalInfoFields.image_url = pi.image_url;
+
             await PersonalInfo.update(
-                {
-                    full_name: resumeDataCopy.personal_info.full_name,
-                    profession: resumeDataCopy.personal_info.profession,
-                    email: resumeDataCopy.personal_info.email,
-                    phone: resumeDataCopy.personal_info.phone,
-                    location: resumeDataCopy.personal_info.location,
-                    linkedin: resumeDataCopy.personal_info.linkedin,
-                    website: resumeDataCopy.personal_info.website,
-                    image_url: resumeDataCopy.personal_info.image_url // Updated from imagekit above
-                },
+                personalInfoFields,
                 {
                     where: { resume_id: resumeId }
                 }
             );
         }
 
-        // 5. Re-fetch the updated resume WITH its personal info included
+        // 5. Re-fetch the updated resume
         const updatedResume = await Resume.findOne({
             where: { id: resumeId, user_id: userId },
             include: [{
                 model: PersonalInfo,
-                as: 'personal_info' // Must match the 'as' alias in your model relationship declaration
+                as: 'personal_info' 
             }]
         });
 
@@ -215,7 +221,8 @@ export const updateResume = async (req, res) => {
     } catch (error) {
         console.error("Error updating resume:", error);
         return res.status(500).json({
-            message: "An internal server error occurred"
+            message: "An internal server error occurred",
+            error: error.message // This tells us the exact error if it continues failing
         });
     }
 };

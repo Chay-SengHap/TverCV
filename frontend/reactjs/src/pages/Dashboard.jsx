@@ -1,4 +1,4 @@
-import { FilePenLineIcon, PencilIcon, PlusIcon, TrashIcon, UploadCloud, UploadCloudIcon, XIcon } from 'lucide-react'
+import { FilePenLineIcon, LoaderCircleIcon, PencilIcon, PlusIcon, TrashIcon, UploadCloud, UploadCloudIcon, XIcon } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { dummyResumeData } from '../assets/assets';
 import { useNavigate } from 'react-router-dom';
@@ -89,14 +89,42 @@ const Dashboard = () => {
 };
   
   const editTitle =async (event) => {
-    event.preventDefault();
+
+    try {
+      event.preventDefault();
+      const { data } = await api.put(`/api/resumes/update` , {resumeId : editResumeId , resumeData : {title}}, {headers : {
+        Authorization : `Bearer ${token}`
+       
+      }})
+      setAllResumes(allResumes.map(resume=>resume.id === editResumeId ? {
+        ...resume , title
+      } : resume))
+      setTitle('')
+      setEditResumeId('')
+      toast.success(data.message)
+      
+
+    } catch (error) {
+       toast.error(error?.response?.data?.message || error.message);
+    }
   }
 
   const deleteResume =async (resumeId) => {
-    const confirm = window.confirm('Are you sure you want to delete this resume?');
+    try {
+      const confirm = window.confirm('Are you sure you want to delete this resume?');
     if(confirm) {
-      setAllResumes(prev => prev.filter(resume => resume._id !== resumeId))
+      const { data } = await api.delete(`/api/resumes/delete/${resumeId}` ,  {headers : {
+        Authorization : `Bearer ${token}`
+       
+      }})
+       setAllResumes(allResumes.filters(resume => resume.id != resumeId))
+       toast.success(data.message)
+    
     }
+    } catch (error) {
+       toast.error(error?.response?.data?.message || "Failed to delete resume");
+    }
+    
   }
 
 
@@ -144,10 +172,10 @@ const Dashboard = () => {
                   Updated on {new Date(resume.updatedAt).toLocaleDateString()}
                 </p>
                 <div onClick={e => e.stopPropagation()} className=' absolute top-1 right-1 group-hover:flex items-center hidden'>
-                  <TrashIcon onClick={() => deleteResume(resume._id)} className=' size-7 p-1.5 hover:bg-white/50 rounded text-slate-700 transition-colors' />
+                  <TrashIcon onClick={() => deleteResume(resume.id)} className=' size-7 p-1.5 hover:bg-white/50 rounded text-slate-700 transition-colors' />
                   <PencilIcon
                     onClick={() => {
-                      setEditResumeId(resume._id)
+                      setEditResumeId(resume.id)
                       setTitle(resume.title)
                     }} className=' size-7 p-1.5 hover:bg-white/50 rounded text-slate-700 transition-colors' />
                 </div>
@@ -207,7 +235,12 @@ const Dashboard = () => {
                 <input type="file" id='resume-input' accept='.pdf' hidden onChange={(e) => setResume(e.target.files[0]) }/>
               </div>
 
-              <button className=' w-full py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors'>Upload resume</button>
+              <button className=' w-full py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors'>
+                {isLoading && <LoaderCircleIcon className='anime-spin size-4 test-white'/>}
+                {isLoading ? 'Uploading...' : 'Uploading Resume'}
+                Upload resume
+                
+                </button>
               <XIcon className=' absolute top-4 right-4 text-slate-400 hover:text-slate-600 cursor-pointer transition-colors'
                 onClick={() => {
                   setShowUploadResume(false);
