@@ -17,12 +17,12 @@ const User = sequelize.define(
             allowNull: false,
             unique: true,
         },
-        // This is your actual database column where the secure hash is stored
+        // This is  actual database column where the secure hash is stored
         password_hash: {
             type: DataTypes.TEXT,
         },
         // This is a temporary memory-only slot that catches 
-        // the "password" field from your React frontend
+        // the "password" field from React frontend
         password: {
             type: DataTypes.VIRTUAL,
         },
