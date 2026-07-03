@@ -1,43 +1,83 @@
-import { ArrowRightIcon } from "lucide-react";
+import { Key, FileEdit, Download } from "lucide-react";
 
 export default function WhatWeDoSection() {
+    const features = [
+        {
+            title: "AI PDF Resume Import",
+            desc: "Upload your existing PDF resume and let our AI instantly parse the text to pre-fill your profile sections.",
+            icon: Key,
+            bgColor: "bg-purple-50",
+            iconColor: "text-purple-600",
+            borderColor: "border-purple-100",
+        },
+        {
+            title: "Real-Time Template Customizer",
+            desc: "Toggle between Classic, Minimal, or Modern styles and pick custom accent colors with live updates.",
+            icon: FileEdit,
+            bgColor: "bg-emerald-50",
+            iconColor: "text-emerald-600",
+            borderColor: "border-emerald-100",
+        },
+        {
+            title: "Comprehensive Section Builder",
+            desc: "Quickly manage organized inputs for Professional Summaries, Experiences, Educations, Projects, and Skills.",
+            icon: Download,
+            bgColor: "bg-orange-50",
+            iconColor: "text-orange-600",
+            borderColor: "border-orange-100",
+        }
+    ];
+
     return (
-        <section className="flex flex-col md:flex-row items-center justify-center gap-20 mt-20">
-            <div className="relative shadow-2xl shadow-indigo-600/40 rounded-2xl overflow-hidden shrink-0">
-                <img className="max-w-sm w-full object-cover rounded-2xl"
-                    src="/assets/job.png"
-                    alt="" />
-                <div className="flex items-center gap-1 max-w-72 absolute bottom-8 left-8 bg-white p-4 rounded-xl">
-                    <div className="flex -space-x-4 shrink-0">
-                        <img src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=200" alt="image"
-                            className="size-9 rounded-full border-[3px] border-white hover:-translate-y-1 transition z-1" />
-                        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200" alt="image"
-                            className="size-9 rounded-full border-[3px] border-white hover:-translate-y-1 transition z-[2]" />
-                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=200&h=200&auto=format&fit=crop"
-                            alt="image"
-                            className="size-9 rounded-full border-[3px] border-white hover:-translate-y-1 transition z-[3]" />
-                        <div
-                            className="flex items-center justify-center text-xs  text-white size-9 rounded-full border-[3px] border-white bg-red-600 hover:-translate-y-1 transition z-[4]">
-                            50+
-                        </div>
-                    </div>
-                    <p className="text-sm font-medium text-slate-800">Improve Your CV with TverCV</p>
-                </div>
+        <section className="max-w-7xl mx-auto px-6 py-12 lg:py-16 min-h-[85vh] flex flex-col justify-center">
+            {/* Header */}
+            <div className="text-center space-y-3 mb-10">
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900">
+                    Build Your CV
+                </h2>
+                <p className="text-gray-500 text-sm sm:text-base max-w-xl mx-auto">
+                    Create, edit and download professional resumes with TverCV
+                </p>
             </div>
-            <div className="text-sm text-slate-600 max-w-md">
-                <h1 className="text-xl uppercase font-semibold text-slate-700">Build your resume</h1>
-                <div className="w-24 h-[3px] rounded-full bg-gradient-to-r from-red-600 to-[#ffd9d9]"></div>
-                <p className="mt-8">PrebuiltUI helps you build faster by transforming your design vision into fully functional,
-                    production-ready UI components. </p>
-                <p className="mt-4">Whether you're launching a SaaS app, landing page, or dashboard, our collection of Tailwind
-                    CSS components is crafted to boost your development speed and improve user experience.</p>
-                <p className="mt-4">From UI design systems to automation-ready layouts, PrebuiltUI empowers you to build
-                    beautifully and scale effortlessly.</p>
-                <button className="flex items-center gap-2 mt-8 hover:opacity-90 transition btn py-3 px-8 rounded-full text-white">
-                    <span>Read more</span>
-                    <ArrowRightIcon className='size-5' />
-                </button>
+
+            {/* Content Grid */}
+            <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                {/* Left side Image */}
+                <div className="lg:col-span-5 flex justify-center">
+                    <div className="relative w-full max-w-sm rounded-3xl overflow-hidden shadow-xl hover:scale-[1.01] transition-transform duration-300">
+                        <img 
+                            className="w-full max-h-[50vh] object-contain bg-slate-50"
+                            src="/assets/job.png"
+                            alt="SpongeBob building CV" 
+                        />
+                    </div>
+                </div>
+
+                {/* Right side Features list */}
+                <div className="lg:col-span-7 space-y-4">
+                    {features.map((feat, index) => {
+                        const IconComponent = feat.icon;
+                        return (
+                            <div 
+                                key={index} 
+                                className={`flex items-start gap-4 p-4 rounded-2xl border ${feat.borderColor} ${feat.bgColor} transition-all duration-300 hover:shadow-md`}
+                            >
+                                <div className={`p-3 rounded-xl bg-white shadow-sm shrink-0`}>
+                                    <IconComponent className={`size-5 sm:size-6 ${feat.iconColor}`} />
+                                </div>
+                                <div className="space-y-1">
+                                    <h4 className="text-sm sm:text-base font-bold text-gray-800">
+                                        {feat.title}
+                                    </h4>
+                                    <p className="text-gray-500 text-xs sm:text-sm leading-relaxed">
+                                        {feat.desc}
+                                    </p>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
         </section>
     );
-};
+}

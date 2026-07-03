@@ -1,6 +1,7 @@
 {
-  "script": {
-    "server": "nodemon server.js"
+  "scripts": {
+    "server": "nodemon server.js",
+    "dev": "nodemon server.js"
   },
   "type": "module",
   "dependencies": {

@@ -12,15 +12,20 @@ import Footer from '../components/home/Footer'
 const Home = () => {
   return (
     <div>
-      <main className='px-4'>
-        <Navbar />
-        <HeroSection />
-        <WhatWeDoSection />
-        <OurLatestCreations />
-        <OurTestimonialSection />
-        <FaqSection />
-        <Newsletter />
-        <Footer />
+      <Navbar />
+      <main className="space-y-6 sm:space-y-10">
+        <div id="home" className="scroll-mt-20">
+          <HeroSection />
+        </div>
+        <div id="features" className="scroll-mt-20">
+          <WhatWeDoSection />
+        </div>
+        <div id="testimonials" className="scroll-mt-20">
+          <OurTestimonialSection />
+        </div>
+        <div id="contact" className="scroll-mt-20">
+          <Footer />
+        </div>
       </main>
     </div>
   )
