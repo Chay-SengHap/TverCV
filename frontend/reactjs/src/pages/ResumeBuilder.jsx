@@ -11,11 +11,17 @@ import ExperienceForm from '../components/ExperienceForm';
 import EducationForm from '../components/EducationForm';
 import ProjectForm from '../components/ProjectForm';
 import SkillsForm from '../components/SkillsForm';
+import { useSelector } from 'react-redux';
+import api from '../config/api';
 
 
 const ResumeBuilder = () => {
   
   const {resumeId} = useParams();
+
+  const {token} = useSelector(state=> state.auth)
+
+
 
   const [resumeData, setResumeData] = useState({
     _id: '',
@@ -32,13 +38,40 @@ const ResumeBuilder = () => {
   })
 
   const loadExistingResume = async () => {
-    // load existing resume data
-    const resume = dummyResumeData.find(resume => resume._id === resumeId);
-    if(resume) {
-      setResumeData(resume);
-      document.title = resume.title;
+  try {
+    const { data } = await api.get(`/api/resumes/get/${resumeId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    
+    if (data.resume) {
+      const dbResume = data.resume;
+      
+      // Map relational database arrays safely into your local state
+      setResumeData({
+          _id: dbResume.id,
+          title: dbResume.title || "",
+          personal_info: dbResume.personal_info || {},
+          professional_summary: dbResume.professional_summary || "",
+          experience: dbResume.experiences || [],
+          education: dbResume.education || [],
+          project: dbResume.projects || [],
+          skills: dbResume.skills || [],
+          template: dbResume.template || "classic",
+          accent_color: dbResume.accent_color || "#3882F6",
+          public: dbResume.is_public || false,
+      });
+      
+      document.title = dbResume.title || "Resume Builder";
     }
+  } catch (error) {
+    console.log("Error loading resume details:", error);
+     console.log(error.response);
+  console.log(error.response?.data);
+  console.log(error.response?.data?.message);
   }
+};
 
   const [activeSectionIndex, setActiveSectionIndex] = useState(0);
   const [removeBackground, setRemoveBackground] = useState(false);

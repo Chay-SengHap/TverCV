@@ -92,7 +92,7 @@ const Dashboard = () => {
 
     try {
       event.preventDefault();
-      const { data } = await api.put(`/api/resumes/update` , {resumeId : editResumeId , resumeData : {title}}, {headers : {
+      const { data } = await api.put('/api/resumes/update' , {resumeId : editResumeId , resumeData : {title}}, {headers : {
         Authorization : `Bearer ${token}`
        
       }})
@@ -117,7 +117,8 @@ const Dashboard = () => {
         Authorization : `Bearer ${token}`
        
       }})
-       setAllResumes(allResumes.filters(resume => resume.id != resumeId))
+      console.log(resumeId)
+       setAllResumes(allResumes.filter(resume => resume.id !== resumeId))
        toast.success(data.message)
     
     }
@@ -164,7 +165,7 @@ const Dashboard = () => {
           {allResumes.map((resume, index) => {
             const baseColor = colors[index % colors.length];
             return (
-              <button key={index} onClick={() => navigate(`/app/builder/${resume._id}`)} className=' relative w-full sm:max-w-36 h-48 flex flex-col items-center justify-center rounded-lg gap-2 border group hover:shadow-lg transition-all duration-300 cursor-pointer' style={{ background: `linear-gradient(135deg, ${baseColor}10, ${baseColor}40)`, borderColor: baseColor + '40' }}>
+              <button key={index} onClick={() => navigate(`/app/builder/${resume.id}`)} className=' relative w-full sm:max-w-36 h-48 flex flex-col items-center justify-center rounded-lg gap-2 border group hover:shadow-lg transition-all duration-300 cursor-pointer' style={{ background: `linear-gradient(135deg, ${baseColor}10, ${baseColor}40)`, borderColor: baseColor + '40' }}>
 
                 <FilePenLineIcon className=' size-7 group-hover:scale-105 transition-all' style={{ color: baseColor }} />
                 <p className=' text-sm group-hover:scale-105 transition-all px-2 text-center' style={{ color: baseColor }}>{resume.title}</p>
@@ -235,10 +236,11 @@ const Dashboard = () => {
                 <input type="file" id='resume-input' accept='.pdf' hidden onChange={(e) => setResume(e.target.files[0]) }/>
               </div>
 
-              <button className=' w-full py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors'>
-                {isLoading && <LoaderCircleIcon className='anime-spin size-4 test-white'/>}
-                {isLoading ? 'Uploading...' : 'Uploading Resume'}
-                Upload resume
+              <button disabled={isLoading} className=' w-full py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors flex items-center justify-center'>
+                  {isLoading && <LoaderCircleIcon className='animate-spin size-4 text-white'/>}
+                  {isLoading ? 'Uploading...' : 'Upload Resume'}
+
+                
                 
                 </button>
               <XIcon className=' absolute top-4 right-4 text-slate-400 hover:text-slate-600 cursor-pointer transition-colors'

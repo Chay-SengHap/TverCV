@@ -53,8 +53,8 @@ const SkillsForm = ({data, onChange}) => {
       {data.length > 0 ? (
         <div className=' flex flex-wrap gap-2'>
           {data.map((skill, index) => (
-            <span key={index} className=' flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm'>
-              {skill}
+            <span key={skill.id || index} className=' flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm'>
+              {skill.skill_name}
               <button 
                 onClick={() => removeSkill(index)}
                 className=' ml-1 hover:bg-blue-200 rounded-full p-0.5 transition-colors '

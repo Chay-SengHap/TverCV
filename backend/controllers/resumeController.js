@@ -68,7 +68,7 @@ export const getResumeById = async (req, res) => {
 
     return res.status(200).json({
       message: "Resume fetched successfully",
-      data: resume
+      resume: resume // Sending it explicitly as 'resume' to match frontend needs
     });
 
   } catch (error) {
@@ -111,8 +111,7 @@ export const updateResume = async (req, res) => {
     const image = req.file;
 
     // 1. Parse the string into an object first
-    let resumeDataCopy = JSON.parse(resumeData);
-
+    let resumeDataCopy = typeof resumeData === 'string' ? JSON.parse(resumeData) : resumeData;
     // 2. Handle image upload if a file exists (external service call, not DB — stays here)
     if (image) {
       const imageBufferData = fs.createReadStream(image.path);

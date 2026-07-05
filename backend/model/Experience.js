@@ -14,9 +14,8 @@ export const Experience = sequelize.define(
             allowNull: false,
         },
         position: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            defaultValue: 0,
+            type: DataTypes.STRING(255),
+            allowNull: true,
         },
         company: {
             type: DataTypes.STRING(255),
@@ -42,4 +41,3 @@ export const Experience = sequelize.define(
         timestamps: false,
     }
 );
-
