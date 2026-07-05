@@ -1,21 +1,24 @@
 import { Mail, Phone, MapPin } from "lucide-react";
 
 const MinimalImageTemplate = ({ data, accentColor }) => {
-    const formatDate = (dateStr) => {
-        if (!dateStr) return "";
-        const [year, month] = dateStr.split("-");
-        return new Date(year, month - 1).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-        });
-    };
+   const formatDate = (dateStr) => {
+    if (!dateStr || dateStr.trim() === "" || dateStr.includes("undefined")) return "Date Not Set";
+    if (!dateStr.includes("-")) return dateStr;
+    
+    const [year, month] = dateStr.split("-");
+    if (!year || !month || isNaN(year) || isNaN(month)) return "Date Not Set";
+
+    return new Date(year, month - 1).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short"
+    });
+};
 
     return (
         <div className="max-w-5xl mx-auto bg-white text-zinc-800">
             <div className="grid grid-cols-3">
 
                 <div className="col-span-1  py-10">
-                    {/* Image */}
                     {data.personal_info?.image && typeof data.personal_info.image === 'string' ? (
                         <div className="mb-6">
                             <img src={data.personal_info.image} alt="Profile" className="w-32 h-32 object-cover rounded-full mx-auto" style={{ background: accentColor+'70' }} />
@@ -29,7 +32,6 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
                     )}
                 </div>
 
-                {/* Name + Title */}
                 <div className="col-span-2 flex flex-col justify-center py-10 px-8">
                     <h1 className="text-4xl font-bold text-zinc-700 tracking-widest">
                         {data.personal_info?.full_name || "Your Name"}
@@ -39,11 +41,8 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
                     </p>
                 </div>
 
-                {/* Left Sidebar */}
                 <aside className="col-span-1 border-r border-zinc-400 p-6 pt-0">
 
-
-                    {/* Contact */}
                     <section className="mb-8">
                         <h2 className="text-sm font-semibold tracking-widest text-zinc-600 mb-3">
                             CONTACT
@@ -70,7 +69,6 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
                         </div>
                     </section>
 
-                    {/* Education */}
                     {data.education && data.education.length > 0 && (
                         <section className="mb-8">
                             <h2 className="text-sm font-semibold tracking-widest text-zinc-600 mb-3">
@@ -90,7 +88,6 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
                         </section>
                     )}
 
-                    {/* Skills */}
                     {data.skills && data.skills.length > 0 && (
                         <section>
                             <h2 className="text-sm font-semibold tracking-widest text-zinc-600 mb-3">
@@ -98,17 +95,17 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
                             </h2>
                             <ul className="space-y-1 text-sm">
                                 {data.skills.map((skill, index) => (
-                                    <li key={index}>{skill}</li>
+                                    <li key={index}>
+                                        {skill.skill_name} ({skill.proficiency})
+                                    </li>
                                 ))}
                             </ul>
                         </section>
                     )}
                 </aside>
 
-                {/* Right Content */}
                 <main className="col-span-2 p-8 pt-0">
 
-                    {/* Summary */}
                     {data.professional_summary && (
                         <section className="mb-8">
                             <h2 className="text-sm font-semibold tracking-widest mb-3" style={{ color: accentColor }} >
@@ -120,7 +117,6 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
                         </section>
                     )}
 
-                    {/* Experience */}
                     {data.experience && data.experience.length > 0 && (
                         <section>
                             <h2 className="text-sm font-semibold tracking-widest mb-4" style={{ color: accentColor }} >
@@ -131,7 +127,7 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
                                     <div key={index}>
                                         <div className="flex justify-between items-center">
                                             <h3 className="font-semibold text-zinc-900">
-                                                {exp.position}
+                                                {exp.position || exp.job_title}
                                             </h3>
                                             <span className="text-xs text-zinc-500">
                                                 {formatDate(exp.start_date)} -{" "}
@@ -154,7 +150,6 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
                         </section>
                     )}
 
-                    {/* Projects */}
                     {data.project && data.project.length > 0 && (
                         <section>
                             <h2 className="text-sm uppercase tracking-widest font-semibold" style={{ color: accentColor }}>
@@ -184,6 +179,5 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
         </div>
     );
 }
-
 
 export default MinimalImageTemplate;

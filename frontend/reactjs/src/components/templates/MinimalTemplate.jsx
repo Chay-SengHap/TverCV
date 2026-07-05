@@ -1,13 +1,17 @@
 
 const MinimalTemplate = ({ data, accentColor }) => {
     const formatDate = (dateStr) => {
-        if (!dateStr) return "";
-        const [year, month] = dateStr.split("-");
-        return new Date(year, month - 1).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short"
-        });
-    };
+    if (!dateStr || dateStr.trim() === "" || dateStr.includes("undefined")) return "Date Not Set";
+    if (!dateStr.includes("-")) return dateStr;
+    
+    const [year, month] = dateStr.split("-");
+    if (!year || !month || isNaN(year) || isNaN(month)) return "Date Not Set";
+
+    return new Date(year, month - 1).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short"
+    });
+};
 
     return (
         <div className="max-w-4xl mx-auto p-8 bg-white text-gray-900 font-light">
@@ -119,7 +123,7 @@ const MinimalTemplate = ({ data, accentColor }) => {
                     </h2>
 
                     <div className="text-gray-700">
-                        {data.skills.join(" • ")}
+                        {data.skills.skill_name}
                     </div>
                 </section>
             )}

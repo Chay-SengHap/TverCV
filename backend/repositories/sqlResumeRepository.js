@@ -1,6 +1,4 @@
-
-import { Resume } from "../model/Resume.js"
-import { PersonalInfo } from "../model/Personal_info.js"
+import { Resume, PersonalInfo, Experience, Education, Project, Skill } from "../model/Relationship.js"
 
 // Create a new resume
 export async function createResume(userId, title) {
@@ -33,20 +31,26 @@ export async function deleteResume(resumeId, userId) {
 }
 
 // Get a resume by id, scoped to the owning user
-export async function getResumeById(resumeId, userId) {
-  try {
-    const resume = await Resume.findOne({
-      where: {
-        id: resumeId,
-        user_id: userId
-      }
-    });
-    return resume;
-  } catch (error) {
-    console.error("Repository error fetching resume:", error);
-    throw error;
-  }
-}
+export const getResumeById = async (resumeId, userId) => {
+    try {
+        const resume = await Resume.findOne({
+            where: { 
+                id: resumeId,
+                user_id: userId 
+            },
+            include: [
+                { model: PersonalInfo, as: "personal_info" },
+                { model: Experience, as: "experiences" },
+                { model: Education, as: "education" },
+                { model: Project, as: "projects" },
+                { model: Skill, as: "skills" }
+            ]
+        });
+        return resume;
+    } catch (error) {
+        throw new Error("Database query failed: " + error.message);
+    }
+};
 
 // Get a resume by id, only if it's public (no user scoping)
 export async function getPublicResumeById(resumeId) {
@@ -145,7 +149,7 @@ export async function getResumeWithPersonalInfo(resumeId, userId) {
       where: { id: resumeId, user_id: userId },
       include: [{
         model: PersonalInfo,
-        as: 'personal_info' // Must match the 'as' alias in your model relationship
+        as: 'PersonalInfo'
       }]
     });
     return resume;
