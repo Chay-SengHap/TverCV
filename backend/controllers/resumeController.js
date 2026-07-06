@@ -5,7 +5,7 @@ import { imageKit } from "../config/imageKit.js"
 import fs from 'fs'
 import {PersonalInfo} from "../model/Personal_info.js"
 import * as resumeRepository from "../repositories/sqlResumeRepository.js";
-
+import { sequelize } from "../db/database.js"
 
 // Post : /api/resumes/create
 export const createResume = async (req, res) => {
@@ -105,62 +105,73 @@ export const getPublicResumeById = async (req, res) => {
 
 // Put : /api/resume/update
 export const updateResume = async (req, res) => {
+  const transaction = await sequelize.transaction();
   try {
-    const userId = req.userId; // user_id from auth token
+    const userId = req.userId;
     const { resumeId, resumeData, removeBackground } = req.body;
     const image = req.file;
 
-    // 1. Parse the string into an object first
-    let resumeDataCopy = typeof resumeData === 'string' ? JSON.parse(resumeData) : resumeData;
-    // 2. Handle image upload if a file exists (external service call, not DB — stays here)
+    const data = typeof resumeData === "string" ? JSON.parse(resumeData) : resumeData;
+    console.log(req.file);
     if (image) {
-      const imageBufferData = fs.createReadStream(image.path);
+      const stream = fs.createReadStream(image.path);
+
       const response = await imageKit.files.upload({
-        file: imageBufferData,
+        file: stream,
         fileName: `resume-${resumeId}.jpg`,
-        folder: 'user-resume',
+        folder: "user-resume",
         transformation: {
-          pre: 'w-300,h-300,fo-face,z-0.75' + (removeBackground ? ',e-bgremove' : '')
-        }
+          pre: "w-300,h-300,fo-face,z-0.75" + (removeBackground ? ",e-bgremove" : ""),
+        },
       });
+      console.log(response.url)
 
-      // Clean up the temporary file from local disk
-      fs.unlinkSync(image.path);
+      if (fs.existsSync(image.path)) {
+        fs.unlinkSync(image.path);
+      }
 
-      if (!resumeDataCopy.personal_info) resumeDataCopy.personal_info = {};
-      resumeDataCopy.personal_info.image_url = response.url;
+      if (!data.personal_info) data.personal_info = {};
+      data.personal_info.image_url = response.url;
     }
 
-    // 3. Update the main Resume table
-    const affectedRows = await resumeRepository.updateResumeFields(
-      resumeId,
-      userId,
-      resumeDataCopy
-    );
+    await resumeRepository.updateResumeFields(resumeId, userId, data, { transaction });
 
-    if (affectedRows === 0) {
-      return res.status(404).json({
-        message: "Resume not found or you are not authorized to update it"
-      });
+    if (data.personal_info) {
+      await resumeRepository.upsertPersonalInfo(resumeId, data.personal_info, { transaction });
     }
 
-    // 4. Update the Personal Info table if personal info data was sent
-    if (resumeDataCopy.personal_info) {
-      await resumeRepository.updatePersonalInfo(resumeId, resumeDataCopy.personal_info);
+    if (data.experience) {
+      await resumeRepository.replaceExperiences(resumeId, data.experience, { transaction });
     }
 
-    // 5. Re-fetch the updated resume WITH its personal info included
-    const updatedResume = await resumeRepository.getResumeWithPersonalInfo(resumeId, userId);
+    if (data.education) {
+      await resumeRepository.replaceEducation(resumeId, data.education, { transaction });
+    }
+
+    if (data.project) {
+      await resumeRepository.replaceProjects(resumeId, data.project, { transaction });
+    }
+
+    if (data.skills) {
+      await resumeRepository.replaceSkills(resumeId, data.skills, { transaction });
+    }
+
+    await transaction.commit();
+
+    const updatedResume = await resumeRepository.getResumeById(resumeId, userId);
 
     return res.status(200).json({
-      message: 'Saved successfully',
-      resume: updatedResume
+      message: "Resume updated successfully",
+      resume: updatedResume,
     });
-
   } catch (error) {
-    console.error("Error updating resume:", error);
+    await transaction.rollback();
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+    console.error(error);
     return res.status(500).json({
-      message: "An internal server error occurred"
+      message: error.message,
     });
   }
 };

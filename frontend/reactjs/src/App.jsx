@@ -28,14 +28,15 @@ export default function App() {
         try {
             if(token){
                 const {data} = await api.get('/api/users/data' , {
-                    header : {
-                        Authorization : token
+                    headers : {
+                        Authorization : `Bearer ${token}`
                     }
                 })    
                 
-                if(data.user){
-                    dispatch(login({token , user : data.user}))
-                }
+                dispatch(login({
+                    token,
+                    user: data
+                }));
                 dispatch(setLoading(false))
             }else{
                 dispatch(setLoading(false))

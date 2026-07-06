@@ -147,7 +147,7 @@ export const uploadResume = async (req, res) => {
         if (parsedData.personal_info) {
             await PersonalInfo.create({
                 resume_id: newResume.id,
-                image: parsedData.personal_info.image || "",
+                image_url: parsedData.personal_info.image || "",
                 full_name: parsedData.personal_info.full_name || "",
                 profession: parsedData.personal_info.profession || "",
                 email: parsedData.personal_info.email || "",

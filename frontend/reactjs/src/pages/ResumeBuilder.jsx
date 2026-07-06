@@ -1,6 +1,6 @@
 import React, { useState, useEffect} from 'react'
 import { dummyResumeData } from '../assets/assets';
-import { Link, useParams } from 'react-router-dom';
+import { data, Link, useParams } from 'react-router-dom';
 import { ArrowLeftIcon, User, FileText, Briefcase, GraduationCap, FolderIcon, Sparkles, ChevronLeft, ChevronRight, Share2Icon, EyeIcon, EyeOffIcon, DownloadIcon } from 'lucide-react';
 import PersonalInfoForm from '../components/PersonalInfoForm';
 import ResumePreview from '../components/ResumePreview';
@@ -13,6 +13,7 @@ import ProjectForm from '../components/ProjectForm';
 import SkillsForm from '../components/SkillsForm';
 import { useSelector } from 'react-redux';
 import api from '../config/api';
+import toast from 'react-hot-toast'
 
 
 const ResumeBuilder = () => {
@@ -92,7 +93,24 @@ const ResumeBuilder = () => {
   }, []);
 
   const changeResumeVisility = async () => {
-    setResumeData({...resumeData, public: !resumeData.public})
+   try {
+    const formData = new FormData()
+    formData.append('resumeId' , resumeId)
+    formData.append('resumeData' , JSON.stringify({public : !resumeData.public}))
+
+    const { data } = await api.put(`/api/resumes/update`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    setResumeData({...resumeData , public : !resumeData.public})
+    toast.success(data.message)
+    
+
+   } catch (error) {
+    toast.error(data.error)
+    console.log(error)
+   }
   }
 
   const handleShare = () => {
@@ -108,6 +126,46 @@ const ResumeBuilder = () => {
 
   const downloadResume = () => {
     window.print();
+  }
+
+  const saveResume = async ()=>{
+    try {
+      let updatedResumeData = structuredClone(resumeData)
+
+      // remove img for updated ResumeData 
+      if(typeof resumeData.personal_info.image_url === 'object'){
+        delete updatedResumeData.personal_info.image_url
+      }
+
+      const formData = new FormData()
+      formData.append("resumeId" , resumeId)
+      formData.append('resumeData' , JSON.stringify(updatedResumeData))
+
+      removeBackground && formData.append('removeBackground' , 'yes')
+      if (resumeData.personal_info.image_url instanceof File) {
+        formData.append("image", resumeData.personal_info.image_url);
+      }
+      const { data } = await api.put(`/api/resumes/update`,formData , {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+   setResumeData(prev => ({
+      ...prev,
+      personal_info: data.resume.personal_info || {},
+      professional_summary: data.resume.professional_summary || "",
+      experience: data.resume.experiences || [],
+      education: data.resume.education || [],
+      project: data.resume.projects || [],
+      skills: data.resume.skills || [],
+      template: data.resume.template || prev.template,
+      accent_color: data.resume.accent_color || prev.accent_color,
+      public: data.resume.is_public ?? prev.public,
+    }))
+    toast.success(data.message)
+    } catch (error) {
+      toast.error(error)
+    }
   }
   
   return (
@@ -205,7 +263,7 @@ const ResumeBuilder = () => {
                   )}
  
               </div>
-              <button className=' bg-gradient-to-br from-green-100 to bg-green-200 ring-green-300 text-green-600 ring hover:ring-green-400 transition-all rounded-md px-6 py-2 mt-6 text-sm'>
+              <button onClick={()=>{ toast.promise(saveResume ,{loading : 'Saving...'} )}} className=' bg-gradient-to-br from-green-100 to bg-green-200 ring-green-300 text-green-600 ring hover:ring-green-400 transition-all rounded-md px-6 py-2 mt-6 text-sm'>
                 Save Changes
               </button>
 

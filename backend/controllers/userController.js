@@ -38,6 +38,7 @@ export async function getUserById(req, res) {
     const userData = user.toJSON ? user.toJSON() : user;
     delete userData.password_hash;
 
+    console.log(userData)
     res.json(userData);
   } catch (error) {
     console.error("Error fetching user:", error);

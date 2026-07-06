@@ -118,17 +118,39 @@ const MinimalTemplate = ({ data, accentColor }) => {
             {/* Skills */}
             {data.skills && data.skills.length > 0 && (
                 <section>
-                    <h2 className="text-sm uppercase tracking-widest mb-6 font-medium" style={{ color: accentColor }}>
-                        Skills
-                    </h2>
+                   {data.skills && data.skills.length > 0 && (
+            <section>
+                <h2 className="text-sm uppercase tracking-widest mb-6 font-medium" style={{ color: accentColor }}>
+                    Skills
+                </h2>
 
-                    <div className="text-gray-700">
-                        {data.skills.skill_name}
-                    </div>
-                </section>
-            )}
-        </div>
-    );
+                                <div style={{ display: "block", width: "100%" }}>
+                                    {data.skills.map((skill, index) => (
+                                        <span 
+                                            key={index} 
+                                            style={{ 
+                                                display: "inline-block", 
+                                                backgroundColor: "#f3f4f6", 
+                                                color: "#1f2937",
+                                                padding: "4px 12px",
+                                                marginRight: "8px",
+                                                marginBottom: "8px",
+                                                borderRadius: "4px",
+                                                fontSize: "14px",
+                                                WebkitPrintColorAdjust: "exact",
+                                                printColorAdjust: "exact"
+                                            }}
+                                        >
+                                            {skill.skill_name} ({skill.proficiency})
+                                        </span>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+                        </section>
+                    )}
+                </div>
+            );
 }
 
 export default MinimalTemplate;
