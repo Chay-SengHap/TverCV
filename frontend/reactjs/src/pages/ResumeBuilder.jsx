@@ -1,5 +1,4 @@
 import React, { useState, useEffect} from 'react'
-import { dummyResumeData } from '../assets/assets';
 import { data, Link, useParams } from 'react-router-dom';
 import { ArrowLeftIcon, User, FileText, Briefcase, GraduationCap, FolderIcon, Sparkles, ChevronLeft, ChevronRight, Share2Icon, EyeIcon, EyeOffIcon, DownloadIcon } from 'lucide-react';
 import PersonalInfoForm from '../components/PersonalInfoForm';
@@ -96,7 +95,7 @@ const ResumeBuilder = () => {
    try {
     const formData = new FormData()
     formData.append('resumeId' , resumeId)
-    formData.append('resumeData' , JSON.stringify({public : !resumeData.public}))
+    formData.append('resumeData' , JSON.stringify({is_public : !resumeData.public}))
 
     const { data } = await api.put(`/api/resumes/update`, formData, {
       headers: {

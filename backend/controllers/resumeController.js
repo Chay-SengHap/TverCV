@@ -112,10 +112,14 @@ export const updateResume = async (req, res) => {
     const image = req.file;
 
     const data = typeof resumeData === "string" ? JSON.parse(resumeData) : resumeData;
-    console.log(req.file);
+
+    // Normalization fallback block: ensures both 'public' and 'is_public' routes work safely
+    if (data.public !== undefined) {
+      data.is_public = data.public;
+    }
+
     if (image) {
       const stream = fs.createReadStream(image.path);
-
       const response = await imageKit.files.upload({
         file: stream,
         fileName: `resume-${resumeId}.jpg`,
@@ -124,7 +128,6 @@ export const updateResume = async (req, res) => {
           pre: "w-300,h-300,fo-face,z-0.75" + (removeBackground ? ",e-bgremove" : ""),
         },
       });
-      console.log(response.url)
 
       if (fs.existsSync(image.path)) {
         fs.unlinkSync(image.path);

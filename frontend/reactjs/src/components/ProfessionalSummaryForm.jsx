@@ -11,6 +11,7 @@ const ProfessionalSummaryForm = ({data, onChange, setResumeData}) => {
   const [isGenerating , setIsGenerating] = useState(false)
 
   const generateSummary = async ()=>{
+    if (isGenerating) return;
     try {
       setIsGenerating(true)
       const propmt  = `enhance my professional summary "${data}"`
