@@ -51,21 +51,23 @@ const Dashboard = () => {
   event.preventDefault();
   setIsLoading(true);
   try {
-    const resumeText = await pdfToText(resume);
-    
-    // FIX: Check if the text extraction actually worked before hitting the backend
-    if (!resumeText || resumeText.trim() === "") {
-      toast.error("Could not read any text from this PDF. Please make sure it is not a scanned image file.");
+    if (!resume) {
+      toast.error("Please select a PDF file first.");
       setIsLoading(false);
       return;
     }
 
+    const formData = new FormData();
+    formData.append("resume", resume);
+    formData.append("title", title);
+
     const { data } = await api.post(
       '/api/ai/upload-resume', 
-      { resumeText, title }, 
+      formData, 
       {
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
         }
       }
     );
