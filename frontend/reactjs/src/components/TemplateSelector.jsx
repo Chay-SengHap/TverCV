@@ -19,12 +19,32 @@ const TemplateSelector = ({selectedTemplate, onChange}) => {
     {
       id: "minimal-image",
       name: "Minimal Image",
-      preview: "Minimal design with a single image and clean typography"
+      preview: "Minimal design focusing on clean typography and featuring a profile image header"
     },
     {
       id: "minimal",
       name: "Minimal",
-      preview: "A clean, traditional resume format with clear sections and professional typography"
+      preview: "A clean, simple layout with subtle borders and clean presentation"
+    },
+    {
+      id: "executive",
+      name: "Executive",
+      preview: "High-end centered header with elegant spacing and horizontal dividers"
+    },
+    {
+      id: "creative",
+      name: "Creative",
+      preview: "Bold styled left sidebar background, tag-based skills, and modern visual hierarchy"
+    },
+    {
+      id: "modern-right",
+      name: "Modern Right",
+      preview: "A sleek modern layout with a styled sidebar on the right side"
+    },
+    {
+      id: "academic",
+      name: "Academic/CV",
+      preview: "A formal, dense layout designed for academic, research, or detailed history"
     }
   ]
   
