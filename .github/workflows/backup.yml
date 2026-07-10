@@ -24,18 +24,6 @@ jobs:
         with:
           python-version: "3.12"
 
-
-  env:
-    DB_HOST: ${{ secrets.DB_HOST }}
-    DB_PORT: ${{ secrets.DB_PORT }}
-    DB_USER: ${{ secrets.DB_USER }}
-    DB_NAME: ${{ secrets.DB_NAME }}
-  run: |
-    echo "DB_HOST=$DB_HOST"
-    echo "DB_PORT=$DB_PORT"
-    echo "DB_USER=$DB_USER"
-    echo "DB_NAME=$DB_NAME"
-
       - name: Run Backup Script
         env:
           DB_HOST: ${{ secrets.DB_HOST }}
