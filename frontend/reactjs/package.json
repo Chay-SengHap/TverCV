@@ -12,8 +12,13 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.12.0",
+<<<<<<< HEAD
     "axios": "^1.18.1",
     "lenis": "^1.3.25",
+=======
+    "axios": "^1.17.0",
+    "lenis": "^1.3.23",
+>>>>>>> 8cb4045c4285f8390b9c3264803446dc085fc011
     "lucide-react": "^0.545.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",

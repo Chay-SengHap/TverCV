@@ -1,6 +1,5 @@
-import { FilePenLineIcon, PencilIcon, PlusIcon, TrashIcon, UploadCloud, UploadCloudIcon, XIcon } from 'lucide-react'
+import { FilePenLineIcon, LoaderCircleIcon, PencilIcon, PlusIcon, TrashIcon, UploadCloud, UploadCloudIcon, XIcon } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
-import { dummyResumeData } from '../assets/assets';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import api from '../config/api';
@@ -52,21 +51,23 @@ const Dashboard = () => {
   event.preventDefault();
   setIsLoading(true);
   try {
-    const resumeText = await pdfToText(resume);
-    
-    // FIX: Check if the text extraction actually worked before hitting the backend
-    if (!resumeText || resumeText.trim() === "") {
-      toast.error("Could not read any text from this PDF. Please make sure it is not a scanned image file.");
+    if (!resume) {
+      toast.error("Please select a PDF file first.");
       setIsLoading(false);
       return;
     }
 
+    const formData = new FormData();
+    formData.append("resume", resume);
+    formData.append("title", title);
+
     const { data } = await api.post(
       '/api/ai/upload-resume', 
-      { resumeText, title }, 
+      formData, 
       {
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
         }
       }
     );
@@ -89,14 +90,43 @@ const Dashboard = () => {
 };
   
   const editTitle =async (event) => {
-    event.preventDefault();
+
+    try {
+      event.preventDefault();
+      const { data } = await api.put('/api/resumes/update' , {resumeId : editResumeId , resumeData : {title}}, {headers : {
+        Authorization : `Bearer ${token}`
+       
+      }})
+      setAllResumes(allResumes.map(resume=>resume.id === editResumeId ? {
+        ...resume , title
+      } : resume))
+      setTitle('')
+      setEditResumeId('')
+      toast.success(data.message)
+      
+
+    } catch (error) {
+       toast.error(error?.response?.data?.message || error.message);
+    }
   }
 
   const deleteResume =async (resumeId) => {
-    const confirm = window.confirm('Are you sure you want to delete this resume?');
+    try {
+      const confirm = window.confirm('Are you sure you want to delete this resume?');
     if(confirm) {
-      setAllResumes(prev => prev.filter(resume => resume._id !== resumeId))
+      const { data } = await api.delete(`/api/resumes/delete/${resumeId}` ,  {headers : {
+        Authorization : `Bearer ${token}`
+       
+      }})
+      console.log(resumeId)
+       setAllResumes(allResumes.filter(resume => resume.id !== resumeId))
+       toast.success(data.message)
+    
     }
+    } catch (error) {
+       toast.error(error?.response?.data?.message || "Failed to delete resume");
+    }
+    
   }
 
 
@@ -136,18 +166,18 @@ const Dashboard = () => {
           {allResumes.map((resume, index) => {
             const baseColor = colors[index % colors.length];
             return (
-              <button key={index} onClick={() => navigate(`/app/builder/${resume._id}`)} className=' relative w-full sm:max-w-36 h-48 flex flex-col items-center justify-center rounded-lg gap-2 border group hover:shadow-lg transition-all duration-300 cursor-pointer' style={{ background: `linear-gradient(135deg, ${baseColor}10, ${baseColor}40)`, borderColor: baseColor + '40' }}>
+              <button key={index} onClick={() => navigate(`/app/builder/${resume.id}`)} className=' relative w-full sm:max-w-36 h-48 flex flex-col items-center justify-center rounded-lg gap-2 border group hover:shadow-lg transition-all duration-300 cursor-pointer' style={{ background: `linear-gradient(135deg, ${baseColor}10, ${baseColor}40)`, borderColor: baseColor + '40' }}>
 
                 <FilePenLineIcon className=' size-7 group-hover:scale-105 transition-all' style={{ color: baseColor }} />
                 <p className=' text-sm group-hover:scale-105 transition-all px-2 text-center' style={{ color: baseColor }}>{resume.title}</p>
                 <p className=' absolute bottom-1 text-[11px] text-slate-400 group-hover:text-slate-500 transition-all duration-300 px-2 text-center' style={{ color: baseColor + '90' }}>
-                  Updated on {new Date(resume.updatedAt).toLocaleDateString()}
+                  Updated on {new Date(resume.updated_at).toLocaleDateString()}
                 </p>
                 <div onClick={e => e.stopPropagation()} className=' absolute top-1 right-1 group-hover:flex items-center hidden'>
-                  <TrashIcon onClick={() => deleteResume(resume._id)} className=' size-7 p-1.5 hover:bg-white/50 rounded text-slate-700 transition-colors' />
+                  <TrashIcon onClick={() => deleteResume(resume.id)} className=' size-7 p-1.5 hover:bg-white/50 rounded text-slate-700 transition-colors' />
                   <PencilIcon
                     onClick={() => {
-                      setEditResumeId(resume._id)
+                      setEditResumeId(resume.id)
                       setTitle(resume.title)
                     }} className=' size-7 p-1.5 hover:bg-white/50 rounded text-slate-700 transition-colors' />
                 </div>
@@ -207,7 +237,13 @@ const Dashboard = () => {
                 <input type="file" id='resume-input' accept='.pdf' hidden onChange={(e) => setResume(e.target.files[0]) }/>
               </div>
 
-              <button className=' w-full py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors'>Upload resume</button>
+              <button disabled={isLoading} className=' w-full py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors flex items-center justify-center'>
+                  {isLoading && <LoaderCircleIcon className='animate-spin size-4 text-white'/>}
+                  {isLoading ? 'Uploading...' : 'Upload Resume'}
+
+                
+                
+                </button>
               <XIcon className=' absolute top-4 right-4 text-slate-400 hover:text-slate-600 cursor-pointer transition-colors'
                 onClick={() => {
                   setShowUploadResume(false);

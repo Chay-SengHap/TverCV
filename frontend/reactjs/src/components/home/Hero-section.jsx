@@ -1,111 +1,105 @@
-import { ArrowRightIcon, CheckIcon, CopyIcon } from "lucide-react";
+import { ArrowRightIcon, Infinity, Sparkles } from "lucide-react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-
+import heroImg from "../../../public/assets/hero_white_bg.png";
 
 export default function HeroSection() {
-    
-    const {user} = useSelector (state => state.auth)
-
-
-
-    const logos = [
-        '/assets/companies-logo/instagram.svg',
-        '/assets/companies-logo/framer.svg',
-        '/assets/companies-logo/microsoft.svg',
-        '/assets/companies-logo/huawei.svg',
-        '/assets/companies-logo/walmart.svg',
-    ]
-
-   
+    const { user } = useSelector((state) => state.auth);
 
     return (
-        <section className="flex flex-col items-center justify-center relative h-svh overflow-hidden">
-            <svg className="absolute inset-0 -z-10" width="1440" height="1018" viewBox="0 0 1440 1018" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <g filter="url(#a)">
-                    <ellipse cx="271.282" cy="200.379" rx="271.282" ry="200.379" fill="#FBFFE1" />
-                </g>
-                <g filter="url(#b)">
-                    <ellipse cx="993.487" cy="451.53" rx="359.487" ry="265.53" fill="url(#c)" fillOpacity=".1" />
-                </g>
-                <defs>
-                    <filter id="a" x="-300" y="-300" width="1142.56" height="1000.76" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
-                        <feFlood floodOpacity="0" result="BackgroundImageFix" />
-                        <feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-                        <feGaussianBlur stdDeviation="150" result="effect1_foregroundBlur_8119_961" />
-                    </filter>
-                    <filter id="b" x="333.9" y="-114.1" width="1319.18" height="1131.26" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
-                        <feFlood floodOpacity="0" result="BackgroundImageFix" />
-                        <feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-                        <feGaussianBlur stdDeviation="150.05" result="effect1_foregroundBlur_8119_961" />
-                        <feTurbulence type="fractalNoise" baseFrequency="0.65 0.65" stitchTiles="stitch" numOctaves="3" result="noise" seed="9943" />
-                        <feColorMatrix in="noise" type="luminanceToAlpha" result="alphaNoise" />
-                        <feComponentTransfer in="alphaNoise" result="coloredNoise1">
-                            <feFuncA type="discrete" tableValues="1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" />
-                        </feComponentTransfer>
-                        <feComposite operator="in" in2="effect1_foregroundBlur_8119_961" in="coloredNoise1" result="noise1Clipped" />
-                        <feFlood floodColor="rgba(0, 0, 0, 0.25)" result="color1Flood" />
-                        <feComposite operator="in" in2="noise1Clipped" in="color1Flood" result="color1" />
-                        <feMerge result="effect2_noise_8119_961">
-                            <feMergeNode in="effect1_foregroundBlur_8119_961" />
-                            <feMergeNode in="color1" />
-                        </feMerge>
-                    </filter>
-                    <linearGradient id="c" x1="550.41" y1="500.394" x2="1343.15" y2="82.986" gradientUnits="userSpaceOnUse">
-                        <stop stopColor="#F6DFF4" />
-                        <stop offset=".196" stopColor="#FF6E00" />
-                        <stop offset=".407" stopColor="#F8C04D" />
-                        <stop offset=".586" stopColor="#EF3EC2" />
-                        <stop offset=".816" stopColor="#4700EC" />
-                        <stop offset=".949" stopColor="#5100BA" />
-                    </linearGradient>
-                </defs>
-            </svg>
-            <div className="flex flex-wrap items-center justify-center p-1.5 rounded-full border border-indigo-100">
-                <div className="flex items-center -space-x-3">
-                    <img className="size-7 rounded-full border-3 border-white"
-                        src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=50" alt="userImage1" />
-                    <img className="size-7 rounded-full border-3 border-white"
-                        src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=50" alt="userImage2" />
-                    <img className="size-7 rounded-full border-3 border-white"
-                        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=50&h=50&auto=format&fit=crop"
-                        alt="userImage3" />
+        <div className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-gradient-to-br from-white via-slate-50/30 to-white py-12 sm:py-20 lg:py-24">
+            {/* Background decorative glow elements */}
+            <div className="absolute top-10 left-10 w-72 h-72 sm:w-96 sm:h-96 bg-red-100/40 rounded-full blur-3xl -z-10 animate-pulse"></div>
+            <div className="absolute bottom-10 right-10 w-72 h-72 sm:w-96 sm:h-96 bg-blue-100/30 rounded-full blur-3xl -z-10 animate-pulse" style={{ animationDelay: '2s' }}></div>
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+                {/* Left Content Column */}
+                <div className="lg:col-span-7 space-y-6 sm:space-y-8 flex flex-col justify-center text-center lg:text-left items-center lg:items-start order-2 lg:order-1">
+                    
+                    {/* Premium Tag Badge */}
+                    <div className="inline-flex items-center gap-2 bg-gradient-to-r from-red-500/10 to-orange-500/10 border border-red-500/20 px-4 py-1.5 rounded-full text-red-600 text-xs sm:text-sm font-semibold tracking-wide">
+                        <Sparkles className="size-4 animate-bounce" />
+                        <span>The Next Generation CV Builder</span>
+                    </div>
+
+                    <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-[1.15] tracking-tight">
+                        Land your dream job with{" "}
+                        <span className="bg-gradient-to-r from-[#e52d27] via-[#d9383a] to-[#b31217] bg-clip-text text-transparent">
+                            AI-powered
+                        </span>{" "}
+                        resumes.
+                    </h1>
+                    
+                    <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto lg:mx-0">
+                        Create, edit and download professional resumes with TverCV
+                    </p>
+
+                    {/* CTA Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto pt-2 justify-center lg:justify-start">
+                        <button className="flex items-center justify-center px-8 py-3.5 rounded-full border-2 border-red-500/80 text-red-600 font-bold hover:bg-red-50/50 active:scale-95 transition-all duration-200 cursor-pointer text-sm">
+                            Demo
+                        </button>
+                        
+                        {!user ? (
+                            <Link 
+                                to="/app?state=register" 
+                                className="flex items-center justify-center gap-2 bg-gradient-to-r from-[#e52d27] to-[#b31217] text-white font-bold px-8 py-3.5 rounded-full hover:shadow-xl hover:shadow-red-500/20 hover:scale-[1.02] active:scale-95 transition-all duration-200 cursor-pointer text-sm"
+                            >
+                                Get Start <ArrowRightIcon className="size-4" />
+                            </Link>
+                        ) : (
+                            <Link 
+                                to="/app" 
+                                className="flex items-center justify-center gap-2 bg-gradient-to-r from-[#e52d27] to-[#b31217] text-white font-bold px-8 py-3.5 rounded-full hover:shadow-xl hover:shadow-red-500/20 hover:scale-[1.02] active:scale-95 transition-all duration-200 cursor-pointer text-sm"
+                            >
+                                Dashboard <ArrowRightIcon className="size-4" />
+                            </Link>
+                        )}
+                    </div>
+
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-3 gap-4 sm:gap-6 pt-8 sm:pt-10 border-t border-gray-200/80 w-full max-w-lg">
+                        <div className="space-y-1">
+                            <h3 className="text-2xl sm:text-3xl font-extrabold text-gray-900">12.5K</h3>
+                            <p className="text-gray-500 text-xs sm:text-sm font-medium">Careers Accelerated</p>
+                        </div>
+                        <div className="space-y-1 border-l border-gray-200 pl-4 sm:pl-6">
+                            <h3 className="text-2xl sm:text-3xl font-extrabold text-gray-900">4</h3>
+                            <p className="text-gray-500 text-xs sm:text-sm font-medium">Free Templates</p>
+                        </div>
+                        <div className="space-y-1 border-l border-gray-200 pl-4 sm:pl-6">
+                            <div className="flex items-center justify-center lg:justify-start gap-1 h-8 sm:h-9">
+                                <Infinity className="size-7 sm:size-8 text-gray-900" />
+                            </div>
+                            <p className="text-gray-500 text-xs sm:text-sm font-medium">Infinity CV build</p>
+                        </div>
+                    </div>
                 </div>
-                <p className="pl-2 pr-3 text-gray-600">Join community of 1m+ founders </p>
+
+                {/* Right Image Column */}
+                <div className="lg:col-span-5 flex items-center justify-center order-1 lg:order-2">
+                    <div className="relative w-full max-w-sm sm:max-w-md lg:max-w-none px-4 sm:px-0">
+                        {/* Soft visual floating background effect */}
+                        <div className="absolute inset-0 bg-gradient-to-tr from-red-500/5 to-blue-500/5 rounded-3xl blur-2xl -z-10"></div>
+                        <img 
+                            className="w-full h-auto drop-shadow-2xl rounded-2xl transform hover:scale-[1.03] transition-all duration-500 animate-[float_6s_ease-in-out_infinite]" 
+                            src={heroImg} 
+                            alt="Clean AI Resume Preview" 
+                            style={{
+                                filter: 'drop-shadow(0 25px 25px rgba(0, 0, 0, 0.08))'
+                            }}
+                        />
+                    </div>
+                </div>
             </div>
 
-            <h1
-                className="text-4xl md:text-6xl/18 text-center font-semibold max-w-2xl mt-5 bg-gradient-to-r from-black to-[#748298] text-transparent bg-clip-text">
-                Land your dream job with{" "}
-                <span className="bg-gradient-to-b from-[#e52d27] to-[#b31217] bg-clip-text text-transparent"> AI-powered </span>resumes.
-            </h1>
-            <p className="text-slate-600 md:text-base max-md:px-2 text-center max-w-lg mt-3">
-                Create, edit and download professional resumes with AI-powered assistance
-            </p>
-
-            <div className="flex gap-5">
-
-                <button
-                    className="flex items-center gap-2 border-2 border-[#e52d27] text-[#e52d27] hover:opacity-90  px-8 py-3 mt-8 rounded-full transition">
-                    <span>Demo</span>
-                   
-                </button>
-                <Link to='/app?state=register' className="flex items-center gap-2 btn hover:opacity-90 text-white px-8 py-3 mt-8 rounded-full transition" hidden={user}>
-                        Get started
-                        <ArrowRightIcon className='size-5' />
-                  
-                </Link>
-                <Link to='/app' className="flex items-center gap-2 btn hover:opacity-90 text-white px-8 py-3 mt-8 rounded-full transition" hidden={!user}>
-                    Dashboard
-                </Link>
-            </div>
-
-           
-            <p className="py-4 text-slate-600 mt-14">Trusting by leading brands, including —</p>
-
-            <div className="flex flex-wrap justify-between max-sm:justify-center gap-10 max-w-4xl w-full mx-auto py-4" id="logo-container">
-                {logos.map((logo, index) => <img key={index} src={logo} alt="logo" className="h-7 w-auto max-w-xs" />)}
-            </div>
-        </section >
+            {/* Float animation CSS injected inline */}
+            <style>{`
+                @keyframes float {
+                    0%, 100% { transform: translateY(0px) rotate(0deg); }
+                    50% { transform: translateY(-10px) rotate(0.5deg); }
+                }
+            `}</style>
+        </div>
     );
 }

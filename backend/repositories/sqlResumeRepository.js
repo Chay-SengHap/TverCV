@@ -1,8 +1,5 @@
+import { Resume, PersonalInfo, Experience, Education, Project, Skill } from "../model/Relationship.js"
 
-import { Resume } from "../model/Resume.js"
-import { PersonalInfo } from "../model/Personal_info.js"
-
-// Create a new resume
 export async function createResume(userId, title) {
   try {
     const newResume = await Resume.create({
@@ -16,7 +13,6 @@ export async function createResume(userId, title) {
   }
 }
 
-// Delete a resume (scoped to the owning user)
 export async function deleteResume(resumeId, userId) {
   try {
     const deletedRows = await Resume.destroy({
@@ -32,30 +28,41 @@ export async function deleteResume(resumeId, userId) {
   }
 }
 
-// Get a resume by id, scoped to the owning user
-export async function getResumeById(resumeId, userId) {
-  try {
-    const resume = await Resume.findOne({
-      where: {
-        id: resumeId,
-        user_id: userId
-      }
-    });
-    return resume;
-  } catch (error) {
-    console.error("Repository error fetching resume:", error);
-    throw error;
-  }
-}
+export const getResumeById = async (resumeId, userId) => {
+    try {
+        const resume = await Resume.findOne({
+            where: { 
+                id: resumeId,
+                user_id: userId 
+            },
+            include: [
+                { model: PersonalInfo, as: "personal_info" },
+                { model: Experience, as: "experiences" },
+                { model: Education, as: "education" },
+                { model: Project, as: "projects" },
+                { model: Skill, as: "skills" }
+            ]
+        });
+        return resume;
+    } catch (error) {
+        throw new Error("Database query failed: " + error.message);
+    }
+};
 
-// Get a resume by id, only if it's public (no user scoping)
 export async function getPublicResumeById(resumeId) {
   try {
     const resume = await Resume.findOne({
       where: {
         id: resumeId,
         is_public: true
-      }
+      },
+      include: [
+        { model: PersonalInfo, as: "personal_info" },
+        { model: Experience, as: "experiences" },
+        { model: Education, as: "education" },
+        { model: Project, as: "projects" },
+        { model: Skill, as: "skills" }
+      ]
     });
     return resume;
   } catch (error) {
@@ -64,8 +71,7 @@ export async function getPublicResumeById(resumeId) {
   }
 }
 
-// Update the core Resume table fields
-export async function updateResumeFields(resumeId, userId, resumeFields) {
+export async function updateResumeFields(resumeId, userId, resumeFields, options = {}) {
   try {
     const {
       title,
@@ -84,13 +90,14 @@ export async function updateResumeFields(resumeId, userId, resumeFields) {
         template,
         accent_color,
         professional_summary,
-        updated_at: new Date() // Manual update since timestamps: false
+        updated_at: new Date()
       },
       {
         where: {
           id: resumeId,
           user_id: userId
-        }
+        },
+        transaction: options.transaction
       }
     );
 
@@ -101,8 +108,7 @@ export async function updateResumeFields(resumeId, userId, resumeFields) {
   }
 }
 
-// Update the PersonalInfo table linked to a resume
-export async function updatePersonalInfo(resumeId, personalInfoFields) {
+export async function upsertPersonalInfo(resumeId, personalInfoFields, options = {}) {
   try {
     const {
       full_name,
@@ -115,42 +121,143 @@ export async function updatePersonalInfo(resumeId, personalInfoFields) {
       image_url
     } = personalInfoFields;
 
-    const [affectedRows] = await PersonalInfo.update(
-      {
-        full_name,
-        profession,
-        email,
-        phone,
-        location,
-        linkedin,
-        website,
-        image_url
-      },
-      {
-        where: { resume_id: resumeId }
-      }
-    );
+    const existingInfo = await PersonalInfo.findOne({
+      where: { resume_id: resumeId },
+      transaction: options.transaction
+    });
 
-    return affectedRows;
+    if (existingInfo) {
+      return await PersonalInfo.update(
+        {
+          full_name,
+          profession,
+          email,
+          phone,
+          location,
+          linkedin,
+          website,
+          image_url
+        },
+        {
+          where: { resume_id: resumeId },
+          transaction: options.transaction
+        }
+      );
+    } else {
+      return await PersonalInfo.create(
+        {
+          resume_id: resumeId,
+          full_name,
+          profession,
+          email,
+          phone,
+          location,
+          linkedin,
+          website,
+          image_url
+        },
+        { transaction: options.transaction }
+      );
+    }
   } catch (error) {
-    console.error("Repository error updating personal info:", error);
+    console.error("Repository error saving personal info:", error);
     throw error;
   }
 }
 
-// Fetch a resume with its personal info included (used after update)
-export async function getResumeWithPersonalInfo(resumeId, userId) {
+export async function replaceExperiences(resumeId, experiences, options = {}) {
   try {
-    const resume = await Resume.findOne({
-      where: { id: resumeId, user_id: userId },
-      include: [{
-        model: PersonalInfo,
-        as: 'personal_info' // Must match the 'as' alias in your model relationship
-      }]
+    await Experience.destroy({
+      where: { resume_id: resumeId },
+      transaction: options.transaction
     });
-    return resume;
+
+    if (experiences && experiences.length > 0) {
+      const formatted = experiences.map(exp => ({
+        resume_id: resumeId,
+        position: exp.position || exp.job_title,
+        company: exp.company,
+        job_title: exp.job_title || exp.position,
+        start_date: exp.start_date,
+        end_date: exp.end_date,
+        is_current: exp.is_current ? 1 : 0,
+        description: exp.description
+      }));
+
+      await Experience.bulkCreate(formatted, { transaction: options.transaction });
+    }
   } catch (error) {
-    console.error("Repository error fetching resume with personal info:", error);
+    console.error("Repository error sync list experiences:", error);
+    throw error;
+  }
+}
+
+export async function replaceEducation(resumeId, educations, options = {}) {
+  try {
+    await Education.destroy({
+      where: { resume_id: resumeId },
+      transaction: options.transaction
+    });
+
+    if (educations && educations.length > 0) {
+      const formatted = educations.map(edu => ({
+        resume_id: resumeId,
+        institution: edu.institution,
+        degree: edu.degree,
+        field: edu.field,
+        graduation_date: edu.graduation_date,
+        gpa: edu.gpa
+      }));
+
+      await Education.bulkCreate(formatted, { transaction: options.transaction });
+    }
+  } catch (error) {
+    console.error("Repository error sync list education:", error);
+    throw error;
+  }
+}
+
+export async function replaceProjects(resumeId, projects, options = {}) {
+  try {
+    await Project.destroy({
+      where: { resume_id: resumeId },
+      transaction: options.transaction
+    });
+
+    if (projects && projects.length > 0) {
+      const formatted = projects.map(proj => ({
+        resume_id: resumeId,
+        name: proj.name,
+        type: proj.type,
+        description: proj.description
+      }));
+
+      await Project.bulkCreate(formatted, { transaction: options.transaction });
+    }
+  } catch (error) {
+    console.error("Repository error sync list projects:", error);
+    throw error;
+  }
+}
+
+export async function replaceSkills(resumeId, skills, options = {}) {
+  try {
+    await Skill.destroy({
+      where: { resume_id: resumeId },
+      transaction: options.transaction
+    });
+
+    if (skills && skills.length > 0) {
+      const formatted = skills.map(sk => ({
+        resume_id: resumeId,
+        skill_name: sk.skill_name,
+        proficiency: sk.proficiency
+      }));
+
+      await Skill.bulkCreate(formatted, { transaction: options.transaction });
+    }
+  } catch (error) {
+    console.error("Repository error sync list skills:", error);
     throw error;
   }
 }

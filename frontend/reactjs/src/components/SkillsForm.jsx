@@ -1,16 +1,27 @@
 import { Plus, Sparkle, X } from 'lucide-react';
 import React, { useState } from 'react'
 
-const SkillsForm = ({data, onChange}) => {
+const SkillsForm = ({data = [], onChange}) => {
   
   const [newSkill, setNewSkill] = useState("");
 
   const addSkill = () => {
-    if(newSkill.trim() && !data.includes(newSkill.trim())){
-      onChange([...data, newSkill.trim()]);
-      setNewSkill("")
+    const trimmedSkill = newSkill.trim();
+    if (!trimmedSkill) return;
+
+    const isDuplicate = data.some(
+      (item) => item.skill_name?.toLowerCase() === trimmedSkill.toLowerCase()
+    );
+
+    if (!isDuplicate) {
+      const newSkillObject = {
+        skill_name: trimmedSkill,
+        proficiency: "Intermediate"
+      };
+      onChange([...data, newSkillObject]);
+      setNewSkill("");
     }
-  }
+  };
 
   const removeSkill = (indexToRemove) => {
     onChange(data.filter((_, index) => index !== indexToRemove))
@@ -33,8 +44,8 @@ const SkillsForm = ({data, onChange}) => {
       <div className=' flex gap-2'>
         <input
           type="text" 
-          placeholder='Enter a skill (e.g., JavaScript, Project Management'
-          className=' flex-1 px-3 py-2 text-sm '
+          placeholder='Enter a skill (e.g., JavaScript, Project Management)'
+          className=' flex-1 px-3 py-2 text-sm border rounded-lg'
           onChange={(e) => setNewSkill(e.target.value)}
           value={newSkill}
           onKeyDown={handleKeyPress}
@@ -42,7 +53,7 @@ const SkillsForm = ({data, onChange}) => {
 
         <button
           onClick={addSkill}
-          disabled={!newSkill.trim}
+          disabled={!newSkill.trim()}
           className=' flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed '  
         >
           <Plus className=' size-4'/> Add
@@ -53,8 +64,8 @@ const SkillsForm = ({data, onChange}) => {
       {data.length > 0 ? (
         <div className=' flex flex-wrap gap-2'>
           {data.map((skill, index) => (
-            <span key={index} className=' flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm'>
-              {skill}
+            <span key={skill.id || index} className=' flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm'>
+              {skill.skill_name}
               <button 
                 onClick={() => removeSkill(index)}
                 className=' ml-1 hover:bg-blue-200 rounded-full p-0.5 transition-colors '
@@ -67,7 +78,7 @@ const SkillsForm = ({data, onChange}) => {
       ) : (
         <div className=' text-center py-6 text-gray-500'>
           <Sparkle className=' w-10 h-10 mx-auto mb-2 text-gray-300'/>
-          <p>NO skills added yet.</p>
+          <p>No skills added yet.</p>
           <p className=' text-sm'> Add your technical and soft skills above.</p>
         </div>
       )}
@@ -84,4 +95,4 @@ const SkillsForm = ({data, onChange}) => {
   )
 }
 
-export default SkillsForm
+export default SkillsForm;

@@ -15,6 +15,7 @@ import api from "./config/api.js";
 import { login, setLoading } from "./app/features/authSlice.js";
 import { useEffect } from "react";
 import {Toaster} from 'react-hot-toast'
+import Footer from "./components/home/Footer.jsx";
 
 export default function App() {
 
@@ -27,14 +28,15 @@ export default function App() {
         try {
             if(token){
                 const {data} = await api.get('/api/users/data' , {
-                    header : {
-                        Authorization : token
+                    headers : {
+                        Authorization : `Bearer ${token}`
                     }
                 })    
                 
-                if(data.user){
-                    dispatch(login({token , user : data.user}))
-                }
+                dispatch(login({
+                    token,
+                    user: data
+                }));
                 dispatch(setLoading(false))
             }else{
                 dispatch(setLoading(false))
@@ -58,6 +60,7 @@ export default function App() {
             <Toaster/>
             <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/about" element={<Footer />} />
                 <Route path="app" element={<Layout/>}>
                     <Route index element={<Dashboard/>} />
                     <Route path="builder/:resumeId" element={ <ResumeBuilder/>}/>

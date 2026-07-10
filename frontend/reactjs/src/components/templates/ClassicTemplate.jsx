@@ -2,13 +2,17 @@ import { Mail, Phone, MapPin, Linkedin, Globe } from "lucide-react";
 
 const ClassicTemplate = ({ data, accentColor }) => {
     const formatDate = (dateStr) => {
-        if (!dateStr) return "";
-        const [year, month] = dateStr.split("-");
-        return new Date(year, month - 1).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short"
-        });
-    };
+    if (!dateStr || dateStr.trim() === "" || dateStr.includes("undefined")) return "Date Not Set";
+    if (!dateStr.includes("-")) return dateStr;
+    
+    const [year, month] = dateStr.split("-");
+    if (!year || !month || isNaN(year) || isNaN(month)) return "Date Not Set";
+
+    return new Date(year, month - 1).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short"
+    });
+};
 
     return (
         <div className="max-w-4xl mx-auto p-8 bg-white text-gray-800 leading-relaxed">
@@ -148,7 +152,7 @@ const ClassicTemplate = ({ data, accentColor }) => {
                     <div className="flex gap-4 flex-wrap">
                         {data.skills.map((skill, index) => (
                             <div key={index} className="text-gray-700">
-                                • {skill}
+                                • {skill.skill_name}
                             </div>
                         ))}
                     </div>

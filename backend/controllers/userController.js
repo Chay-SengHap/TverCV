@@ -17,7 +17,7 @@ export async function getAllUsers(req, res) {
     if (!users) {
       return res.status(404).json({ message: "No users found" });
     }
-    res.json(users);
+    res.json({users});
   } catch (error) {
     console.error("Error fetching users:", error);
     res.status(500).json({ message: "Server error" });
@@ -38,6 +38,7 @@ export async function getUserById(req, res) {
     const userData = user.toJSON ? user.toJSON() : user;
     delete userData.password_hash;
 
+    console.log(userData)
     res.json(userData);
   } catch (error) {
     console.error("Error fetching user:", error);

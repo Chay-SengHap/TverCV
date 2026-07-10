@@ -1,106 +1,149 @@
-import { MenuIcon, XIcon, ChevronDown, FileTextIcon, ImageUpIcon, FileVideo, AudioLines, LightbulbIcon } from 'lucide-react';
-import { useState } from 'react';
+import { MenuIcon, XIcon } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
-    const [openDropdown, setOpenDropdown] = useState(null);
+    const [activeSection, setActiveSection] = useState('home');
 
     const links = [
-        { name: 'Home', href: '/' },
-        { name: 'Stories', href: '/stories' },
-        { name: 'Pricing', href: '#pricing' },
-        { name: 'Docs', href: '/docs' },
+        { name: 'Home', href: '#home' },
+        { name: 'Features', href: '#features' },
+        { name: 'Testimonials', href: '#testimonials' },
+        { name: 'Contact', href: '#contact' },
     ];
+
+    useEffect(() => {
+        const observerOptions = {
+            root: null,
+            rootMargin: '-40% 0px -50% 0px', // Triggers when the section is in the middle of viewport
+            threshold: 0
+        };
+
+        const observerCallback = (entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    setActiveSection(entry.target.id);
+                }
+            });
+        };
+
+        const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+        links.forEach((link) => {
+            const targetId = link.href.slice(1);
+            const el = document.getElementById(targetId);
+            if (el) {
+                observer.observe(el);
+            }
+        });
+
+        return () => {
+            observer.disconnect();
+        };
+    }, []);
 
     return (
         <>
-            <nav className='sticky top-0 z-50 flex w-full items-center justify-between bg-white/50 px-4 py-3.5 backdrop-blur-md md:px-8 lg:px-16'>
-                <a href='https://prebuiltui.com?utm_source=material'>
-                    <img src='/assets/logoTverCv.png' alt='logo' className='h-8.5 w-auto' width={205} height={48} />
+            <nav className='sticky top-0 z-50 flex w-full items-center justify-between bg-white/85 px-4 py-3.5 backdrop-blur-md border-b border-slate-100 md:px-8 lg:px-16'>
+                <a href='#home' className="flex items-center">
+                    <img src='/assets/logoTverCv.png' alt='logo' className='h-8 w-auto' />
                 </a>
 
-                <div className='hidden items-center space-x-7 text-gray-700 md:flex'>
-                    {links.map((link) => link.subLinks ? (
-                        <div key={link.name} className='group relative' onMouseEnter={() => setOpenDropdown(link.name)} onMouseLeave={() => setOpenDropdown(null)}>
-                            <div className='flex cursor-pointer items-center gap-1 hover:text-black'>
+                <div className='hidden items-center space-x-8 md:flex'>
+                    {links.map((link) => {
+                        const targetId = link.href.slice(1);
+                        const isActive = activeSection === targetId;
+                        return (
+                            <a 
+                                key={link.name} 
+                                href={link.href} 
+                                className={`transition-all duration-200 text-sm relative py-1 ${
+                                    isActive 
+                                        ? 'text-red-500 font-bold' 
+                                        : 'text-slate-600 font-medium hover:text-red-500'
+                                }`}
+                            >
                                 {link.name}
-                                <ChevronDown className={`mt-px size-4 transition-transform duration-200 ${openDropdown === link.name ? 'rotate-180' : ''}`} />
-                            </div>
-
-                            <div className={`absolute top-6 left-0 z-40 w-lg rounded-md border border-gray-100 bg-white p-3 shadow-lg transition-all duration-200 ease-in-out ${openDropdown === link.name ? 'visible translate-y-0 opacity-100' : 'invisible -translate-y-2 opacity-0'}`}>
-                                <p>Explore our AI tools</p>
-                                <div className='mt-3 grid grid-cols-2 gap-2'>
-                                    {link.subLinks.map((sub) => (
-                                        <Link to={sub.href} key={sub.name} className='group/link flex items-center gap-2 rounded-md p-2 transition hover:bg-gray-100'>
-                                            <div className='w-max gap-1 rounded-md btn p-2'>
-                                                <sub.icon className='size-4.5 text-white transition duration-300 group-hover/link:scale-110' />
-                                            </div>
-                                            <div>
-                                                <p className='font-medium'>{sub.name}</p>
-                                                <p className='font-light text-gray-400'>{sub.description}</p>
-                                            </div>
-                                        </Link>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    ) : (
-                        <Link key={link.name} to={link.href} className='transition hover:text-black'>
-                            {link.name}
-                        </Link>
-                    ))}
+                                {isActive && (
+                                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-500 rounded-full animate-pulse" />
+                                )}
+                            </a>
+                        );
+                    })}
                 </div>
+
                 <div className='hidden items-center gap-3 md:flex'>
-                    <Link to='/app?state=register' className='hidden rounded-full btn px-6 py-2 font-medium text-white transition hover:opacity-90 md:inline-block'>
+                    <Link to='/app?state=register' className='rounded-full bg-gradient-to-r from-[#e52d27] to-[#b31217] px-6 py-2 font-semibold text-white text-sm transition hover:opacity-90 hover:shadow-lg hover:shadow-red-500/10 cursor-pointer'>
                         Get Start
                     </Link>
-                    <Link to='/app?state=login' className='hidden rounded-full border-2 px-6 py-2 font-medium text-red-500 transition hover:opacity-90 md:inline-block'>
+                    <Link to='/app?state=login' className='rounded-full border-2 border-red-500/80 px-6 py-1.5 font-semibold text-red-500 text-sm transition hover:bg-red-50 cursor-pointer'>
                         Login
                     </Link>
                 </div>
-                
-                
 
-                <button onClick={() => setIsOpen(true)} className='transition active:scale-90 md:hidden'>
-                    <MenuIcon className='size-6.5' />
+                <button onClick={() => setIsOpen(true)} className='transition active:scale-90 md:hidden p-1 text-slate-700'>
+                    <MenuIcon className='size-6' />
                 </button>
             </nav>
 
-            <div className={`fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-white/20 text-lg font-medium backdrop-blur-2xl transition duration-300 md:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-                {links.map((link) => (
-                    <div key={link.name} className='text-center'>
-                        {link.subLinks ? (
-                            <>
-                                <button onClick={() => setOpenDropdown(openDropdown === link.name ? null : link.name)} className='flex items-center justify-center gap-1 text-gray-800'>
-                                    {link.name}
-                                    <ChevronDown className={`size-4 transition-transform ${openDropdown === link.name ? 'rotate-180' : ''}`} />
-                                </button>
-                                {openDropdown === link.name && (
-                                    <div className='mt-2 flex flex-col gap-2 text-left text-sm'>
-                                        {link.subLinks.map((sub) => (
-                                            <Link key={sub.name} to={sub.href} className='block text-gray-600 transition hover:text-black' onClick={() => setIsOpen(false)}>
-                                                {sub.name}
-                                            </Link>
-                                        ))}
-                                    </div>
-                                )}
-                            </>
-                        ) : (
-                            <Link to={link.href} className='block text-gray-800 transition hover:text-black' onClick={() => setIsOpen(false)}>
-                                {link.name}
-                            </Link>
-                        )}
+            {/* Mobile Navigation Backdrop & Drawer */}
+            <div className={`fixed inset-0 z-50 transition-opacity duration-300 md:hidden ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+                {/* Backdrop overlay */}
+                <div onClick={() => setIsOpen(false)} className="absolute inset-0 bg-slate-950/40 backdrop-blur-xs"></div>
+
+                {/* Right Drawer Panel */}
+                <div className={`absolute top-0 right-0 bottom-0 w-80 max-w-full bg-white shadow-2xl p-6 flex flex-col justify-between transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+                    <div className="space-y-8">
+                        {/* Drawer Header */}
+                        <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                            <img src='/assets/logoTverCv.png' alt='logo' className='h-7 w-auto' />
+                            <button onClick={() => setIsOpen(false)} className='p-1.5 rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition active:scale-95'>
+                                <XIcon className="size-5" />
+                            </button>
+                        </div>
+
+                        {/* Navigation Links */}
+                        <div className="flex flex-col gap-1">
+                            {links.map((link) => {
+                                const targetId = link.href.slice(1);
+                                const isActive = activeSection === targetId;
+                                return (
+                                    <a 
+                                        key={link.name} 
+                                        href={link.href} 
+                                        className={`px-4 py-3 rounded-xl font-semibold text-base transition duration-150 ${
+                                            isActive 
+                                                ? 'bg-red-50 text-red-500' 
+                                                : 'text-slate-700 hover:bg-slate-50 hover:text-red-500'
+                                        }`} 
+                                        onClick={() => setIsOpen(false)}
+                                    >
+                                        {link.name}
+                                    </a>
+                                );
+                            })}
+                        </div>
                     </div>
-                ))}
 
-                <Link to='/' className='rounded-full btn px-8 py-2.5 font-medium text-white transition hover:opacity-90' onClick={() => setIsOpen(false)}>
-                    Login
-                </Link>
-
-                <button onClick={() => setIsOpen(false)} className='rounded-md btn p-2 text-white ring-white active:ring-2'>
-                    <XIcon />
-                </button>
+                    {/* Action Buttons */}
+                    <div className="flex flex-col gap-3 pt-6 border-t border-slate-100">
+                        <Link 
+                            to='/app?state=login' 
+                            className='w-full text-center rounded-full border border-red-500/80 py-2.5 font-bold text-red-500 text-sm transition hover:bg-red-50'
+                            onClick={() => setIsOpen(false)}
+                        >
+                            Login
+                        </Link>
+                        <Link 
+                            to='/app?state=register' 
+                            className='w-full text-center rounded-full bg-gradient-to-r from-[#e52d27] to-[#b31217] py-2.5 font-bold text-white text-sm transition hover:opacity-95 hover:shadow-lg hover:shadow-red-500/10'
+                            onClick={() => setIsOpen(false)}
+                        >
+                            Get Start
+                        </Link>
+                    </div>
+                </div>
             </div>
         </>
     );
