@@ -14,7 +14,7 @@ DB_USER = os.environ["DB_USER"]
 DB_PASSWORD = os.environ["DB_PASSWORD"]
 DB_NAME = os.environ["DB_NAME"]
 
-OUTPUT_DIR = r"C:\Users\U-ser\Downloads\only full backuup\backup"
+OUTPUT_DIR = OUTPUT_DIR = "./backup"
 
 
 def backup_database(host, port, user, password, db_name, output_file):
