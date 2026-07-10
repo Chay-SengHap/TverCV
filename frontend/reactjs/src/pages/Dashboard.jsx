@@ -171,7 +171,7 @@ const Dashboard = () => {
                 <FilePenLineIcon className=' size-7 group-hover:scale-105 transition-all' style={{ color: baseColor }} />
                 <p className=' text-sm group-hover:scale-105 transition-all px-2 text-center' style={{ color: baseColor }}>{resume.title}</p>
                 <p className=' absolute bottom-1 text-[11px] text-slate-400 group-hover:text-slate-500 transition-all duration-300 px-2 text-center' style={{ color: baseColor + '90' }}>
-                  Updated on {new Date(resume.updatedAt).toLocaleDateString()}
+                  Updated on {new Date(resume.updated_at).toLocaleDateString()}
                 </p>
                 <div onClick={e => e.stopPropagation()} className=' absolute top-1 right-1 group-hover:flex items-center hidden'>
                   <TrashIcon onClick={() => deleteResume(resume.id)} className=' size-7 p-1.5 hover:bg-white/50 rounded text-slate-700 transition-colors' />

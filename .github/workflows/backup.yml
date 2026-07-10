@@ -1,0 +1,52 @@
+name: Weekly Database Backup
+
+on:
+  schedule:
+    - cron: '0 1 * * 6'
+
+  workflow_dispatch:
+
+jobs:
+  backup:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install MySQL Client
+        run: sudo apt-get update && sudo apt-get install -y mysql-client
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+
+  env:
+    DB_HOST: ${{ secrets.DB_HOST }}
+    DB_PORT: ${{ secrets.DB_PORT }}
+    DB_USER: ${{ secrets.DB_USER }}
+    DB_NAME: ${{ secrets.DB_NAME }}
+  run: |
+    echo "DB_HOST=$DB_HOST"
+    echo "DB_PORT=$DB_PORT"
+    echo "DB_USER=$DB_USER"
+    echo "DB_NAME=$DB_NAME"
+
+      - name: Run Backup Script
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+        run: python backup/backup.py
+
+      - name: Upload Backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: mysql-backup
+          path: backup/*.sql
