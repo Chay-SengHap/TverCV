@@ -21,7 +21,7 @@ const ResumeBuilder = () => {
 
   const { token } = useSelector(state => state.auth)
 
-
+  const [activeTab, setActiveTab] = useState('edit') // 'edit' or 'preview'
 
   const [resumeData, setResumeData] = useState({
     _id: '',
@@ -132,7 +132,22 @@ const ResumeBuilder = () => {
   }
 
   const downloadResume = () => {
-    window.print();
+    const previewEl = document.getElementById("resume-preview");
+    if (!previewEl) {
+      window.print();
+      return;
+    }
+
+    const clone = previewEl.cloneNode(true);
+    clone.id = "print-clone";
+    document.body.appendChild(clone);
+    document.body.classList.add("printing-resume-active");
+
+    setTimeout(() => {
+      window.print();
+      document.body.removeChild(clone);
+      document.body.classList.remove("printing-resume-active");
+    }, 100);
   }
 
   const saveResume = async () => {
@@ -183,10 +198,34 @@ const ResumeBuilder = () => {
         </Link>
       </div>
 
+      {/* Mobile Tab Switcher */}
+      <div className="lg:hidden max-w-7xl mx-auto px-4 mb-4">
+        <div className="flex bg-gray-100 p-1 rounded-lg">
+          <button
+            onClick={() => setActiveTab('edit')}
+            className={`flex-1 py-2 text-sm font-semibold rounded-md transition-all ${activeTab === 'edit'
+              ? 'bg-white text-gray-900 shadow-sm'
+              : 'text-gray-500 hover:text-gray-700'
+              }`}
+          >
+            Edit Resume
+          </button>
+          <button
+            onClick={() => setActiveTab('preview')}
+            className={`flex-1 py-2 text-sm font-semibold rounded-md transition-all ${activeTab === 'preview'
+              ? 'bg-white text-gray-900 shadow-sm'
+              : 'text-gray-500 hover:text-gray-700'
+              }`}
+          >
+            View Preview
+          </button>
+        </div>
+      </div>
+
       <div className=" max-w-7xl mx-auto px-4 pb-8">
         <div className=" grid lg:grid-cols-12 gap-8">
           {/* Left - Form Section */}
-          <div className=" relative lg:col-span-5 rounded-lg overflow-hidden">
+          <div className={`relative lg:col-span-5 rounded-lg overflow-hidden ${activeTab !== 'edit' ? 'max-lg:hidden' : ''}`}>
             <div className=" bg-white rounded-lg shadow-sm border border-gray-200 p-6 pt-1">
               {/* progress bar using activeSectionIdex */}
               <hr className=' absolute top-0 left-0 right-0 border-2 border-gray-200' />
@@ -278,16 +317,20 @@ const ResumeBuilder = () => {
           </div>
 
           {/* Right -  Preview  */}
-          <div className=' lg:col-span-7 max-lg:mt-6'>
-            <div className=' relative w-full'>
-              <div className=' absolute bottom-3 left-0 right-0 flex items-center justify-end gap-2'>
+          <div className={`lg:col-span-7 max-lg:mt-6 ${activeTab !== 'preview' ? 'max-lg:hidden' : ''}`}>
+            <ResumePreview
+              data={resumeData}
+              template={resumeData.template}
+              accentColor={resumeData.accent_color}
+            >
+              <div className='flex items-center justify-end gap-2 w-full'>
                 {resumeData.public && (
                   <button onClick={handleShare} className=' flex items-center p-2 px-4 gap-2 text-xs bg-gradient-to-br from-blue-100 to-blue-200 text-blue-600 rounded-lg ring-blue-300 hover:ring transition-colors'>
                     <Share2Icon className=' size-4' /> Share
                   </button>
                 )}
 
-                 <button onClick={handleToggleClick} className=' flex items-center p-2 px-4 gap-2 text-xs bg-gradient-to-br from-purple-100 to-purple-200 text-purple-600 ring-purple-300 rounded-lg hover:ring transition-colors'>
+                <button onClick={handleToggleClick} className=' flex items-center p-2 px-4 gap-2 text-xs bg-gradient-to-br from-purple-100 to-purple-200 text-purple-600 ring-purple-300 rounded-lg hover:ring transition-colors'>
                   {resumeData.public ? <EyeIcon className=' size-4' /> : <EyeOffIcon className=' size-4' />}
                   {resumeData.public ? 'Public' : 'Private'}
                 </button>
@@ -296,14 +339,7 @@ const ResumeBuilder = () => {
                   <DownloadIcon className=' size-4' /> Download
                 </button>
               </div>
-
-            </div>
-
-            <ResumePreview
-              data={resumeData}
-              template={resumeData.template}
-              accentColor={resumeData.accent_color}
-            />
+            </ResumePreview>
 
           </div>
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import { Mail, Phone, MapPin, Linkedin, Globe } from "lucide-react";
 
 const CreativeTemplate = ({ data, accentColor }) => {
   if (!data) return null;
@@ -8,176 +8,181 @@ const CreativeTemplate = ({ data, accentColor }) => {
     if (!dateStr.includes("-")) return dateStr;
     const [year, month] = dateStr.split("-");
     if (!year || !month || isNaN(year) || isNaN(month)) return "";
-    return new Date(year, month - 1).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short"
-    });
+    return new Date(year, month - 1).toLocaleDateString("en-US", { year: "numeric", month: "short" });
   };
 
-  return (
-    <div className="w-full max-w-4xl mx-auto bg-white text-gray-900 font-sans flex flex-col md:flex-row print:flex-row min-h-[1000px] border border-gray-100">
-      {/* Sidebar (Left Column) */}
-      <div className="w-full md:w-1/3 print:w-1/3 bg-gray-900 text-white p-6 md:p-8 print:p-8 flex flex-col justify-between" style={{ borderLeft: `6px solid ${accentColor}` }}>
-        <div>
-          {/* Header Contact */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-extrabold tracking-tight mb-2 break-words">
-              {data.personal_info?.full_name || "Your Name"}
-            </h1>
-            <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: accentColor }}>
-              {data.personal_info?.profession || "Profession"}
-            </p>
-          </div>
+  const SideSection = ({ title, children }) => (
+    <div className="mb-7">
+      <h2 className="text-[9px] font-bold uppercase tracking-[0.25em] text-white/50 mb-3">{title}</h2>
+      {children}
+    </div>
+  );
 
-          <div className="space-y-4 text-xs text-gray-300">
-            <h2 className="text-xs uppercase tracking-widest font-bold border-b border-gray-700 pb-1 mb-2">
-              Contact
-            </h2>
+  const MainSection = ({ title, children }) => (
+    <section className="mb-7">
+      <h2
+        className="text-[11px] font-bold uppercase tracking-[0.2em] mb-4 pb-2"
+        style={{ color: accentColor, borderBottom: `1.5px solid ${accentColor}` }}
+      >
+        {title}
+      </h2>
+      {children}
+    </section>
+  );
+
+  return (
+    <div className="w-full max-w-4xl mx-auto bg-white font-sans flex flex-row min-h-[1050px]">
+      {/* Dark Sidebar */}
+      <aside
+        className="w-[230px] shrink-0 text-white p-8 flex flex-col"
+        style={{
+          backgroundColor: "#1a1a2e",
+          borderTop: `5px solid ${accentColor}`,
+          WebkitPrintColorAdjust: "exact",
+          printColorAdjust: "exact"
+        }}
+      >
+        {/* Name */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-extrabold leading-tight tracking-tight mb-1">
+            {data.personal_info?.full_name || "Your Name"}
+          </h1>
+          <p className="text-xs font-bold uppercase tracking-[0.25em]" style={{ color: accentColor }}>
+            {data.personal_info?.profession || "Profession"}
+          </p>
+        </div>
+
+        {/* Contact */}
+        <SideSection title="Contact">
+          <div className="space-y-2.5 text-[13px] text-white/75">
             {data.personal_info?.email && (
-              <div>
-                <p className="font-semibold text-gray-400">Email</p>
-                <p className="break-all">{data.personal_info.email}</p>
+              <div className="flex items-start gap-2">
+                <Mail size={13} style={{ color: accentColor }} className="shrink-0 mt-0.5" />
+                <span className="break-all">{data.personal_info.email}</span>
               </div>
             )}
             {data.personal_info?.phone && (
-              <div>
-                <p className="font-semibold text-gray-400">Phone</p>
-                <p>{data.personal_info.phone}</p>
+              <div className="flex items-start gap-2">
+                <Phone size={13} style={{ color: accentColor }} className="shrink-0 mt-0.5" />
+                <span>{data.personal_info.phone}</span>
               </div>
             )}
             {data.personal_info?.location && (
-              <div>
-                <p className="font-semibold text-gray-400">Location</p>
-                <p>{data.personal_info.location}</p>
+              <div className="flex items-start gap-2">
+                <MapPin size={13} style={{ color: accentColor }} className="shrink-0 mt-0.5" />
+                <span>{data.personal_info.location}</span>
               </div>
             )}
             {data.personal_info?.linkedin && (
-              <div>
-                <p className="font-semibold text-gray-400">LinkedIn</p>
-                <p className="break-all">{data.personal_info.linkedin}</p>
+              <div className="flex items-start gap-2">
+                <Linkedin size={13} style={{ color: accentColor }} className="shrink-0 mt-0.5" />
+                <span className="break-all">{data.personal_info.linkedin}</span>
               </div>
             )}
             {data.personal_info?.website && (
-              <div>
-                <p className="font-semibold text-gray-400">Website</p>
-                <p className="break-all">{data.personal_info.website}</p>
+              <div className="flex items-start gap-2">
+                <Globe size={13} style={{ color: accentColor }} className="shrink-0 mt-0.5" />
+                <span className="break-all">{data.personal_info.website}</span>
               </div>
             )}
           </div>
+        </SideSection>
 
-          {/* Skills Badges */}
-          {data.skills && data.skills.length > 0 && (
-            <div className="mt-8">
-              <h2 className="text-xs uppercase tracking-widest font-bold border-b border-gray-700 pb-1 mb-3">
-                Skills
-              </h2>
-              <div className="flex flex-wrap gap-2">
-                {data.skills.map((skill, index) => (
-                  <span
-                    key={index}
-                    className="text-[10px] font-semibold px-2 py-1 rounded text-white"
-                    style={{
-                      backgroundColor: accentColor,
-                      WebkitPrintColorAdjust: "exact",
-                      printColorAdjust: "exact"
-                    }}
-                  >
-                    {skill.skill_name}
-                  </span>
-                ))}
-              </div>
+        {/* Skills */}
+        {data.skills?.length > 0 && (
+          <SideSection title="Skills">
+            <div className="flex flex-wrap gap-1.5">
+              {data.skills.map((skill, i) => (
+                <span
+                  key={i}
+                  className="text-[11px] font-semibold px-2.5 py-1 rounded-full"
+                  style={{
+                    backgroundColor: accentColor,
+                    color: "#fff",
+                    WebkitPrintColorAdjust: "exact",
+                    printColorAdjust: "exact"
+                  }}
+                >
+                  {skill.skill_name}
+                </span>
+              ))}
             </div>
-          )}
-        </div>
+          </SideSection>
+        )}
 
-        <div className="text-[10px] text-gray-500 mt-8">
-          Generated via TverCV
-        </div>
-      </div>
+        {/* Education */}
+        {data.education?.length > 0 && (
+          <SideSection title="Education">
+            <div className="space-y-3 text-[13px] text-white/75">
+              {data.education.map((edu, i) => (
+                <div key={i}>
+                  <p className="font-bold text-white leading-snug">{edu.degree}</p>
+                  {edu.field && <p className="text-white/60 text-[12px]">{edu.field}</p>}
+                  <p className="italic text-[12px] text-white/50">{edu.institution}</p>
+                  <p className="text-[11px] text-white/40 mt-0.5">
+                    {formatDate(edu.graduation_date)}{edu.gpa && ` · GPA ${edu.gpa}`}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </SideSection>
+        )}
+      </aside>
 
-      {/* Main Content (Right Column) */}
-      <div className="w-full md:w-2/3 print:w-2/3 p-6 md:p-8 print:p-8">
-        {/* Professional Summary */}
+      {/* Main Content */}
+      <main className="flex-1 p-8 bg-white">
+        {/* Summary */}
         {data.professional_summary && (
-          <section className="mb-8">
-            <h2 className="text-lg font-bold mb-3 pb-1 border-b" style={{ borderColor: accentColor }}>
-              About Me
-            </h2>
-            <p className="text-sm text-gray-700 leading-relaxed break-words">
-              {data.professional_summary}
-            </p>
-          </section>
+          <MainSection title="About Me">
+            <p className="text-[14px] text-gray-700 leading-[1.8] text-justify">{data.professional_summary}</p>
+          </MainSection>
         )}
 
         {/* Experience */}
-        {data.experience && data.experience.length > 0 && (
-          <section className="mb-8">
-            <h2 className="text-lg font-bold mb-4 pb-1 border-b" style={{ borderColor: accentColor }}>
-              Experience
-            </h2>
-            <div className="space-y-6">
-              {data.experience.map((exp, index) => (
-                <div key={index} className="relative pl-4 border-l-2" style={{ borderColor: "#f3f4f6" }}>
-                  <div className="flex justify-between items-baseline mb-1">
-                    <h3 className="text-base font-bold text-gray-800 break-words">{exp.position}</h3>
-                    <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
-                      {formatDate(exp.start_date)} - {exp.is_current ? "Present" : formatDate(exp.end_date)}
+        {data.experience?.length > 0 && (
+          <MainSection title="Experience">
+            <div className="space-y-5">
+              {data.experience.map((exp, i) => (
+                <div key={i}>
+                  <div className="flex justify-between items-start mb-0.5">
+                    <h3 className="text-[15px] font-bold text-gray-900">{exp.position}</h3>
+                    <span
+                      className="text-[11px] font-bold px-2 py-0.5 rounded-full text-white shrink-0 ml-3"
+                      style={{ backgroundColor: accentColor, WebkitPrintColorAdjust: "exact", printColorAdjust: "exact" }}
+                    >
+                      {formatDate(exp.start_date)} — {exp.is_current ? "Now" : formatDate(exp.end_date)}
                     </span>
                   </div>
-                  <p className="text-sm font-medium text-gray-600 mb-2 break-words">{exp.company}</p>
+                  <p className="text-[13px] font-semibold text-gray-500 mb-2">{exp.company}</p>
                   {exp.description && (
-                    <div className="text-xs text-gray-700 leading-relaxed whitespace-pre-line break-words">
-                      {exp.description}
-                    </div>
+                    <p className="text-[13px] text-gray-700 leading-relaxed whitespace-pre-line">{exp.description}</p>
                   )}
                 </div>
               ))}
             </div>
-          </section>
+          </MainSection>
         )}
 
         {/* Projects */}
-        {data.project && data.project.length > 0 && (
-          <section className="mb-8">
-            <h2 className="text-lg font-bold mb-4 pb-1 border-b" style={{ borderColor: accentColor }}>
-              Projects
-            </h2>
-            <div className="space-y-4">
-              {data.project.map((proj, index) => (
-                <div key={index} className="bg-gray-50 p-3 rounded">
-                  <h3 className="text-sm font-bold text-gray-800 break-words">{proj.name}</h3>
-                  <p className="text-xs text-gray-600 mt-1 break-words">{proj.description}</p>
+        {data.project?.length > 0 && (
+          <MainSection title="Projects">
+            <div className="space-y-3">
+              {data.project.map((proj, i) => (
+                <div
+                  key={i}
+                  className="p-3 rounded-lg border-l-4"
+                  style={{ borderColor: accentColor, backgroundColor: "#f9f9fb" }}
+                >
+                  <h3 className="text-[15px] font-bold text-gray-900">{proj.name}</h3>
+                  {proj.description && (
+                    <p className="text-[13px] text-gray-600 mt-1 leading-relaxed">{proj.description}</p>
+                  )}
                 </div>
               ))}
             </div>
-          </section>
+          </MainSection>
         )}
-
-        {/* Education */}
-        {data.education && data.education.length > 0 && (
-          <section className="mb-8">
-            <h2 className="text-lg font-bold mb-4 pb-1 border-b" style={{ borderColor: accentColor }}>
-              Education
-            </h2>
-            <div className="space-y-4">
-              {data.education.map((edu, index) => (
-                <div key={index} className="flex justify-between items-baseline">
-                  <div>
-                    <h3 className="text-sm font-bold text-gray-800">
-                      {edu.degree} {edu.field && `in ${edu.field}`}
-                    </h3>
-                    <p className="text-xs text-gray-600">{edu.institution}</p>
-                    {edu.gpa && <p className="text-[10px] text-gray-500">GPA: {edu.gpa}</p>}
-                  </div>
-                  <span className="text-xs font-semibold text-gray-500">
-                    {formatDate(edu.graduation_date)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-      </div>
+      </main>
     </div>
   );
 };

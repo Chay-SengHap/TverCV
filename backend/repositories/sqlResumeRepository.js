@@ -29,24 +29,24 @@ export async function deleteResume(resumeId, userId) {
 }
 
 export const getResumeById = async (resumeId, userId) => {
-    try {
-        const resume = await Resume.findOne({
-            where: { 
-                id: resumeId,
-                user_id: userId 
-            },
-            include: [
-                { model: PersonalInfo, as: "personal_info" },
-                { model: Experience, as: "experiences" },
-                { model: Education, as: "education" },
-                { model: Project, as: "projects" },
-                { model: Skill, as: "skills" }
-            ]
-        });
-        return resume;
-    } catch (error) {
-        throw new Error("Database query failed: " + error.message);
-    }
+  try {
+    const resume = await Resume.findOne({
+      where: {
+        id: resumeId,
+        user_id: userId
+      },
+      include: [
+        { model: PersonalInfo, as: "personal_info" },
+        { model: Experience, as: "experiences" },
+        { model: Education, as: "education" },
+        { model: Project, as: "projects" },
+        { model: Skill, as: "skills" }
+      ]
+    });
+    return resume;
+  } catch (error) {
+    throw new Error("Database query failed: " + error.message);
+  }
 };
 
 export async function getPublicResumeById(resumeId) {
@@ -175,13 +175,13 @@ export async function replaceExperiences(resumeId, experiences, options = {}) {
     if (experiences && experiences.length > 0) {
       const formatted = experiences.map(exp => ({
         resume_id: resumeId,
-        position: exp.position || exp.job_title,
-        company: exp.company,
-        job_title: exp.job_title || exp.position,
-        start_date: exp.start_date,
-        end_date: exp.end_date,
+        position: exp.position || exp.job_title || "",
+        company: exp.company || "",
+        job_title: exp.job_title || exp.position || "",
+        start_date: exp.start_date || "",
+        end_date: exp.end_date || "",
         is_current: exp.is_current ? 1 : 0,
-        description: exp.description
+        description: exp.description || ""
       }));
 
       await Experience.bulkCreate(formatted, { transaction: options.transaction });
@@ -202,11 +202,11 @@ export async function replaceEducation(resumeId, educations, options = {}) {
     if (educations && educations.length > 0) {
       const formatted = educations.map(edu => ({
         resume_id: resumeId,
-        institution: edu.institution,
-        degree: edu.degree,
-        field: edu.field,
-        graduation_date: edu.graduation_date,
-        gpa: edu.gpa
+        institution: edu.institution || "",
+        degree: edu.degree || "",
+        field: edu.field || "",
+        graduation_date: edu.graduation_date || "",
+        gpa: edu.gpa || ""
       }));
 
       await Education.bulkCreate(formatted, { transaction: options.transaction });
@@ -227,9 +227,9 @@ export async function replaceProjects(resumeId, projects, options = {}) {
     if (projects && projects.length > 0) {
       const formatted = projects.map(proj => ({
         resume_id: resumeId,
-        name: proj.name,
-        type: proj.type,
-        description: proj.description
+        name: proj.name || "",
+        type: proj.type || "",
+        description: proj.description || ""
       }));
 
       await Project.bulkCreate(formatted, { transaction: options.transaction });
@@ -250,8 +250,8 @@ export async function replaceSkills(resumeId, skills, options = {}) {
     if (skills && skills.length > 0) {
       const formatted = skills.map(sk => ({
         resume_id: resumeId,
-        skill_name: sk.skill_name,
-        proficiency: sk.proficiency
+        skill_name: sk.skill_name || "",
+        proficiency: sk.proficiency || "intermediate"
       }));
 
       await Skill.bulkCreate(formatted, { transaction: options.transaction });
