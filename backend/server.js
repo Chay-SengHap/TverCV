@@ -6,6 +6,8 @@ import bcrypt from 'bcrypt';
 import userRouter from "./routes/userRoute.js";
 import { resumeRouter } from "./routes/resumeRoute.js";
 import { aiRouter } from "./routes/aiRoute.js";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./config/swagger.js";
 
 const app = express()
 
@@ -91,6 +93,7 @@ app.use(cors())
 app.use('/api/users', userRouter);
 app.use('/api/resumes', resumeRouter);
 app.use('/api/ai', aiRouter);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
 
