@@ -82,7 +82,7 @@ export const enhanceJobDescription = async (req, res) => {
         
         const interaction = await ai.interactions.create({
             model: process.env.AI_MODEL || "gemini-3.5-flash",
-            system_instruction: "You are an expert in resume writing. Your task is to enhance the job description of a resume. Make it compelling and ATS-friendly.",
+            system_instruction: "You are an expert in job description writing. Your task is to enhance job description of a resume. The summary should be 1-2 sentences also highlighting key skills, experience, and career objectives. Make it compelling and ATS-friendly. and only return text no options or anything else.",
             input: userContent,
         });
 
