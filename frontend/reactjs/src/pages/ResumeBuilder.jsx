@@ -222,7 +222,7 @@ const ResumeBuilder = () => {
       </div>
 
       {/* Mobile Tab Switcher */}
-      <div className="lg:hidden max-w-7xl mx-auto px-4 mb-4">
+      <div className="lg:hidden sticky top-0 z-30 bg-white py-2 shadow-sm max-w-7xl mx-auto px-4 mb-4 border-b border-gray-100">
         <div className="flex bg-gray-100 p-1 rounded-lg">
           <button
             onClick={() => setActiveTab('edit')}
@@ -245,10 +245,9 @@ const ResumeBuilder = () => {
         </div>
       </div>
 
-      <div className=" max-w-7xl mx-auto px-4 pb-8">
+      <div className=" max-w-7xl mx-auto px-4 pb-8 max-lg:pb-24">
         <div className=" grid lg:grid-cols-12 gap-8">
-          {/* Left - Form Section */}
-          <div className={`relative lg:col-span-5 rounded-lg overflow-hidden ${activeTab !== 'edit' ? 'max-lg:hidden' : ''}`}>
+          <div className={`relative lg:col-span-5 rounded-lg ${activeTab !== 'edit' ? 'max-lg:hidden' : ''}`}>
             <div className=" bg-white rounded-lg shadow-sm border border-gray-200 p-6 pt-1">
               {/* progress bar using activeSectionIdex */}
               <hr className=' absolute top-0 left-0 right-0 border-2 border-gray-200' />
@@ -256,7 +255,7 @@ const ResumeBuilder = () => {
                 style={{ width: `${activeSectionIndex * 100 / (sections.length - 1)}%` }} />
 
               {/* Section Navigation */}
-              <div className=" flex justify-between items-center mb-6 border-b border-gray-300 py-1">
+              <div className="sticky top-[58px] lg:top-0 z-20 bg-white py-2 flex justify-between items-center mb-6 border-b border-gray-300">
                 <div className=' flex items-center gap-2'>
                   <TemplateSelector
                     selectedTemplate={resumeData.template}
@@ -332,9 +331,11 @@ const ResumeBuilder = () => {
                 )}
 
               </div>
-              <button onClick={() => { toast.promise(saveResume, { loading: 'Saving...' }) }} className=' bg-gradient-to-br from-green-100 to bg-green-200 ring-green-300 text-green-600 ring hover:ring-green-400 transition-all rounded-md px-6 py-2 mt-6 text-sm'>
-                Save Changes
-              </button>
+              <div className='max-lg:fixed max-lg:bottom-0 max-lg:left-0 max-lg:right-0 max-lg:p-4 max-lg:bg-white max-lg:border-t max-lg:border-gray-200 max-lg:z-30 lg:sticky lg:bottom-0 lg:bg-white lg:border-t lg:border-gray-200 lg:py-4 lg:z-10 mt-6'>
+                <button onClick={() => { toast.promise(saveResume, { loading: 'Saving...' }) }} className='w-full lg:w-auto bg-gradient-to-br from-green-100 to bg-green-200 ring-green-300 text-green-600 ring hover:ring-green-400 transition-all rounded-md px-6 py-2 text-sm'>
+                  Save Changes
+                </button>
+              </div>
 
             </div>
           </div>

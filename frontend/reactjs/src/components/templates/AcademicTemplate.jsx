@@ -75,7 +75,7 @@ const AcademicTemplate = ({ data, accentColor }) => {
         {data.professional_summary && (
           <section>
             <SectionTitle>Research Interest & Summary</SectionTitle>
-            <p className="text-[14px] text-gray-800 leading-[1.8] text-justify">{data.professional_summary}</p>
+            <div className="text-[14px] text-gray-800 leading-[1.8] text-justify rich-text-content" dangerouslySetInnerHTML={{ __html: data.professional_summary }} />
           </section>
         )}
 
@@ -119,9 +119,7 @@ const AcademicTemplate = ({ data, accentColor }) => {
                     </span>
                   </div>
                   {exp.description && (
-                    <p className="text-[13px] text-gray-700 leading-[1.8] mt-1.5 whitespace-pre-line text-justify">
-                      {exp.description}
-                    </p>
+                    <div className="text-[13px] text-gray-700 leading-[1.8] mt-1.5 text-justify rich-text-content" dangerouslySetInnerHTML={{ __html: exp.description }} />
                   )}
                 </div>
               ))}
@@ -138,7 +136,7 @@ const AcademicTemplate = ({ data, accentColor }) => {
                 <div key={i}>
                   <h3 className="text-[15px] font-bold text-gray-900 font-sans">{proj.name}</h3>
                   {proj.description && (
-                    <p className="text-[13px] text-gray-700 leading-[1.8] mt-1 text-justify">{proj.description}</p>
+                    <div className="text-[13px] text-gray-700 leading-[1.8] mt-1 text-justify rich-text-content" dangerouslySetInnerHTML={{ __html: proj.description }} />
                   )}
                 </div>
               ))}

@@ -79,7 +79,7 @@ const ClassicTemplate = ({ data, accentColor }) => {
         {data.professional_summary && (
           <section>
             <SectionTitle>Professional Summary</SectionTitle>
-            <p className="text-[13.5px] text-gray-700 leading-[1.8] text-justify">{data.professional_summary}</p>
+            <div className="text-[13.5px] text-gray-700 leading-[1.8] text-justify rich-text-content" dangerouslySetInnerHTML={{ __html: data.professional_summary }} />
           </section>
         )}
 
@@ -100,7 +100,7 @@ const ClassicTemplate = ({ data, accentColor }) => {
                     </span>
                   </div>
                   {exp.description && (
-                    <p className="text-[13.5px] text-gray-600 leading-relaxed mt-2 whitespace-pre-line text-justify">{exp.description}</p>
+                    <div className="text-[13.5px] text-gray-600 leading-relaxed mt-2 text-justify rich-text-content" dangerouslySetInnerHTML={{ __html: exp.description }} />
                   )}
                 </div>
               ))}
@@ -117,7 +117,7 @@ const ClassicTemplate = ({ data, accentColor }) => {
                 <div key={i} className="pl-4 border-l-[1.5px]" style={{ borderColor: accentColor }}>
                   <h3 className="text-[15px] font-bold text-gray-900">{proj.name}</h3>
                   {proj.description && (
-                    <p className="text-[13.5px] text-gray-600 leading-relaxed mt-1.5 text-justify">{proj.description}</p>
+                    <div className="text-[13.5px] text-gray-600 leading-relaxed mt-1.5 text-justify rich-text-content" dangerouslySetInnerHTML={{ __html: proj.description }} />
                   )}
                 </div>
               ))}
