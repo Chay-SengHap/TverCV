@@ -132,9 +132,7 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
             <h2 className="text-[12px] font-bold uppercase tracking-[0.2em] mb-3.5 pl-3 border-l-2" style={{ borderColor: accentColor }}>
               About Me
             </h2>
-            <p className="text-[13.5px] text-gray-600 leading-[1.8] text-justify">
-              {data.professional_summary}
-            </p>
+            <div className="text-[13.5px] text-gray-600 leading-[1.8] text-justify rich-text-content" dangerouslySetInnerHTML={{ __html: data.professional_summary }} />
           </section>
         )}
 
@@ -155,9 +153,7 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
                   </div>
                   <p className="text-[12.5px] font-semibold mb-2" style={{ color: accentColor }}>{exp.company}</p>
                   {exp.description && (
-                    <p className="text-[12.5px] text-gray-600 leading-relaxed whitespace-pre-line text-justify">
-                      {exp.description}
-                    </p>
+                    <div className="text-[12.5px] text-gray-600 leading-relaxed text-justify rich-text-content" dangerouslySetInnerHTML={{ __html: exp.description }} />
                   )}
                 </div>
               ))}
@@ -181,9 +177,7 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
                     </p>
                   )}
                   {proj.description && (
-                    <p className="text-[12.5px] text-gray-600 mt-2 leading-relaxed text-justify">
-                      {proj.description}
-                    </p>
+                    <div className="text-[12.5px] text-gray-600 mt-2 leading-relaxed text-justify rich-text-content" dangerouslySetInnerHTML={{ __html: proj.description }} />
                   )}
                 </div>
               ))}

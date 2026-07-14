@@ -4,6 +4,8 @@ import { useSelector } from 'react-redux'
 import api from '../config/api'
 import toast from 'react-hot-toast'
 
+import RichTextEditor from './RichTextEditor'
+
 const ExperienceForm = ({ data, onChange }) => {
   
   const {token} = useSelector(state=> state.auth)
@@ -145,11 +147,9 @@ const ExperienceForm = ({ data, onChange }) => {
                     Enhance with AI
                   </button>
                 </div>
-                <textarea
+                <RichTextEditor
                   value={experience.description || ""}
-                  onChange={(e) => updateExperience(index, "description", e.target.value)} 
-                  rows={4}
-                  className=' w-full text-sm px-3 py-2 rounded-lg resize-none'
+                  onChange={(val) => updateExperience(index, "description", val)} 
                   placeholder='Describe your key responesibilities and achievements...'
                 />
 

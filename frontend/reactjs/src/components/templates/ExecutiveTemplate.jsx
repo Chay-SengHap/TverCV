@@ -87,7 +87,7 @@ const ExecutiveTemplate = ({ data, accentColor }) => {
         {data.professional_summary && (
           <section>
             <SectionTitle>Executive Summary</SectionTitle>
-            <p className="text-[14px] text-gray-700 leading-[1.8] text-justify">{data.professional_summary}</p>
+            <div className="text-[14px] text-gray-700 leading-[1.8] text-justify rich-text-content" dangerouslySetInnerHTML={{ __html: data.professional_summary }} />
           </section>
         )}
 
@@ -106,7 +106,7 @@ const ExecutiveTemplate = ({ data, accentColor }) => {
                   </div>
                   <p className="text-[13px] italic text-gray-500 mb-2">{exp.company}</p>
                   {exp.description && (
-                    <p className="text-[13px] text-gray-700 leading-relaxed whitespace-pre-line">{exp.description}</p>
+                    <div className="text-[13px] text-gray-700 leading-relaxed rich-text-content" dangerouslySetInnerHTML={{ __html: exp.description }} />
                   )}
                 </div>
               ))}
@@ -123,7 +123,7 @@ const ExecutiveTemplate = ({ data, accentColor }) => {
                 <div key={i}>
                   <h3 className="text-[15px] font-bold text-gray-900">{proj.name}</h3>
                   {proj.description && (
-                    <p className="text-[13px] text-gray-700 leading-relaxed mt-1">{proj.description}</p>
+                    <div className="text-[13px] text-gray-700 leading-relaxed mt-1 rich-text-content" dangerouslySetInnerHTML={{ __html: proj.description }} />
                   )}
                 </div>
               ))}

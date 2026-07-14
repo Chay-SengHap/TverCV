@@ -72,7 +72,7 @@ const ModernTemplate = ({ data, accentColor }) => {
             <h2 className="text-[13px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: accentColor }}>
               Professional Summary
             </h2>
-            <p className="text-[14px] text-gray-700 leading-[1.8] text-justify">{data.professional_summary}</p>
+            <div className="text-[14px] text-gray-700 leading-[1.8] text-justify rich-text-content" dangerouslySetInnerHTML={{ __html: data.professional_summary }} />
           </section>
         )}
 
@@ -89,7 +89,7 @@ const ModernTemplate = ({ data, accentColor }) => {
                     <h3 className="text-[15px] font-bold text-gray-900">{exp.position}</h3>
                     <p className="text-[13px] font-semibold mb-1.5" style={{ color: accentColor }}>{exp.company}</p>
                     {exp.description && (
-                      <p className="text-[13px] text-gray-700 leading-relaxed whitespace-pre-line">{exp.description}</p>
+                      <div className="text-[13px] text-gray-700 leading-relaxed rich-text-content" dangerouslySetInnerHTML={{ __html: exp.description }} />
                     )}
                   </div>
                   <div className="text-right">
@@ -116,7 +116,7 @@ const ModernTemplate = ({ data, accentColor }) => {
                   <div>
                     <h3 className="text-[15px] font-bold text-gray-900">{proj.name}</h3>
                     {proj.description && (
-                      <p className="text-[13px] text-gray-600 leading-relaxed mt-1">{proj.description}</p>
+                      <div className="text-[13px] text-gray-600 leading-relaxed mt-1 rich-text-content" dangerouslySetInnerHTML={{ __html: proj.description }} />
                     )}
                   </div>
                 </div>

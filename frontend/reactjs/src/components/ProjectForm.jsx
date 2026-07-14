@@ -1,5 +1,6 @@
 import { Plus, Trash2 } from 'lucide-react';
 import React from 'react'
+import RichTextEditor from './RichTextEditor'
 
 const ProjectForm = ({data, onChange}) => {
   
@@ -73,12 +74,10 @@ const ProjectForm = ({data, onChange}) => {
                 className=' px-3 py-2 text-sm rounded-lg' 
               />
 
-              <textarea 
-                rows={4}
+               <RichTextEditor 
                 value={project.description || ""}
-                onChange={(e) => updateProject(index, "description", e.target.value)}
+                onChange={(val) => updateProject(index, "description", val)}
                 placeholder='Describe your project...'
-                className=' px-3 py-2 text-sm rounded-lg' 
               />
               
             </div>

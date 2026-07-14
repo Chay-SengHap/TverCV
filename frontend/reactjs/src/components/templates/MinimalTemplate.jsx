@@ -69,11 +69,7 @@ const MinimalTemplate = ({ data, accentColor }) => {
       <div className="space-y-6">
         {/* Summary */}
         {data.professional_summary && (
-          <section className="text-justify">
-            <p className="text-[14px] text-gray-600 leading-[1.8] font-light">
-              {data.professional_summary}
-            </p>
-          </section>
+            <div className="text-[14px] text-gray-600 leading-[1.8] font-light rich-text-content" dangerouslySetInnerHTML={{ __html: data.professional_summary }} />
         )}
 
         {/* Experience */}
@@ -87,7 +83,7 @@ const MinimalTemplate = ({ data, accentColor }) => {
                     <h3 className="text-[15px] font-bold text-gray-900">{exp.position}</h3>
                     <p className="text-[13px] font-medium mt-0.5" style={{ color: accentColor }}>{exp.company}</p>
                     {exp.description && (
-                      <p className="text-[13.5px] text-gray-600 leading-relaxed mt-2 whitespace-pre-line text-justify">{exp.description}</p>
+                      <div className="text-[13.5px] text-gray-600 leading-relaxed mt-2 text-justify rich-text-content" dangerouslySetInnerHTML={{ __html: exp.description }} />
                     )}
                   </div>
                   <span className="text-[12px] text-gray-400 font-medium whitespace-nowrap mt-1">
@@ -108,7 +104,7 @@ const MinimalTemplate = ({ data, accentColor }) => {
                 <div key={i} className="border-l border-gray-200 pl-4 py-0.5">
                   <h3 className="text-[15px] font-bold text-gray-900">{proj.name}</h3>
                   {proj.description && (
-                    <p className="text-[13.5px] text-gray-600 leading-relaxed mt-2 text-justify">{proj.description}</p>
+                    <div className="text-[13.5px] text-gray-600 leading-relaxed mt-2 text-justify rich-text-content" dangerouslySetInnerHTML={{ __html: proj.description }} />
                   )}
                 </div>
               ))}
