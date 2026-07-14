@@ -25,7 +25,7 @@ const ClassicTemplate = ({ data, accentColor }) => {
       {/* Header */}
       <header className="px-12 pt-10 pb-6 text-center border-b-[3px]" style={{ borderColor: accentColor }}>
         <h1 className="text-[2.6rem] font-bold tracking-tight text-gray-900 mb-1 uppercase"
-          style={{ letterSpacing: "0.08em", fontFamily: "'Georgia', serif" }}>
+          style={{ letterSpacing: "0.08em"}}>
           {data.personal_info?.full_name || "Your Name"}
         </h1>
         <p className="text-[12px] font-bold tracking-[0.25em] uppercase mb-4" style={{ color: accentColor }}>

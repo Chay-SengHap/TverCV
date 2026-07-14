@@ -13,7 +13,7 @@ import AcademicTemplate from './templates/AcademicTemplate';
 const A4_WIDTH_PX = 794;
 const A4_HEIGHT_PX = 1123;
 
-const ResumePreview = ({ data, template, accentColor, children }) => {
+const ResumePreview = ({ data, template, accentColor, mode, children }) => {
   const containerRef = useRef(null);
   const contentRef = useRef(null);
   const [scale, setScale] = useState(1);
@@ -66,6 +66,11 @@ const ResumePreview = ({ data, template, accentColor, children }) => {
       // Get the width of the parent container to know how much horizontal space we have
       const parentWidth = targetElement.parentElement?.offsetWidth || targetElement.offsetWidth;
       const widthScale = parentWidth / A4_WIDTH_PX;
+
+      if (mode === 'thumbnail') {
+        setScale(widthScale);
+        return;
+      }
 
       // Get the available vertical viewport height (using less padding on desktop for a larger preview)
       const padding = window.innerWidth >= 1024 ? 110 : 160;
@@ -210,6 +215,28 @@ const ResumePreview = ({ data, template, accentColor, children }) => {
           </div>
         ))}
         {printStyles}
+      </div>
+    );
+  }
+
+  if (mode === 'thumbnail') {
+    return (
+      <div
+        ref={containerRef}
+        className="bg-white overflow-hidden relative pointer-events-none select-none rounded-sm border border-slate-200/50 shadow-sm"
+        style={{ width: `${A4_WIDTH_PX * scale}px`, height: `${A4_HEIGHT_PX * scale}px` }}
+      >
+        <div
+          style={{
+            width: A4_WIDTH_PX,
+            transformOrigin: 'top left',
+            transform: `scale(${scale})`,
+          }}
+        >
+          <div ref={contentRef}>
+            {renderTemplate()}
+          </div>
+        </div>
       </div>
     );
   }

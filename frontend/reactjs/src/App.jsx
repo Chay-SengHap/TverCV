@@ -9,6 +9,7 @@ import Layout from "./pages/Layout";
 import Dashboard from './pages/Dashboard';
 import ResumeBuilder from './pages/ResumeBuilder';
 import Preview from './pages/Preview'
+import Profile from './pages/Profile';
 import {Login} from "./pages/Login";
 import { useDispatch } from "react-redux";
 import api from "./config/api.js";
@@ -64,6 +65,7 @@ export default function App() {
                 <Route path="app" element={<Layout/>}>
                     <Route index element={<Dashboard/>} />
                     <Route path="builder/:resumeId" element={ <ResumeBuilder/>}/>
+                    <Route path="profile" element={<Profile />} />
                 </Route>
 
                 <Route path="view/:resumeId" element={ <Preview/> }/>

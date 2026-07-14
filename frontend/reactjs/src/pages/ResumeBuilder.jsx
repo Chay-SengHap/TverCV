@@ -192,10 +192,33 @@ const ResumeBuilder = () => {
 
   return (
     <>
-      <div className=" max-w-7xl mx-auto px-4 py-6">
+      <div className=" max-w-7xl mx-auto px-4 py-6 flex items-center justify-between gap-4 flex-wrap">
         <Link to={'/app'} className=" inline-flex gap-2 items-center text-slate-500 hover:text-slate-700 tranall">
           <ArrowLeftIcon className=' size-4' /> Back to Dashboard
         </Link>
+
+        <div className='flex items-center gap-2'>
+          {resumeData.public && (
+            <button onClick={handleShare} className=' flex items-center p-2 px-4 gap-2 text-xs bg-gradient-to-br from-blue-100 to-blue-200 text-blue-600 rounded-lg ring-blue-300 hover:ring transition-colors'>
+              <Share2Icon className=' size-4' /> Share
+            </button>
+          )}
+
+          <button
+            onClick={handleToggleClick}
+            className={`flex items-center p-2 px-4 gap-2 text-xs rounded-lg transition-colors ${resumeData.public
+                ? 'bg-gradient-to-br from-purple-100 to-purple-200 text-purple-600 ring-purple-300 hover:ring'
+                : 'bg-rose-50 border border-rose-100/50 text-[#e52d27] hover:bg-rose-100/50'
+              }`}
+          >
+            {resumeData.public ? <EyeIcon className=' size-4' /> : <EyeOffIcon className=' size-4' />}
+            {resumeData.public ? 'Public' : 'Private'}
+          </button>
+
+          <button onClick={downloadResume} className=' flex items-center gap-2 px-6 py-2 text-xs bg-gradient-to-br from-green-100 to-green-200 text-green-600 rounded-lg ring-green-300 hover:ring transition-colors'>
+            <DownloadIcon className=' size-4' /> Download
+          </button>
+        </div>
       </div>
 
       {/* Mobile Tab Switcher */}
@@ -322,24 +345,7 @@ const ResumeBuilder = () => {
               data={resumeData}
               template={resumeData.template}
               accentColor={resumeData.accent_color}
-            >
-              <div className='flex items-center justify-end gap-2 w-full'>
-                {resumeData.public && (
-                  <button onClick={handleShare} className=' flex items-center p-2 px-4 gap-2 text-xs bg-gradient-to-br from-blue-100 to-blue-200 text-blue-600 rounded-lg ring-blue-300 hover:ring transition-colors'>
-                    <Share2Icon className=' size-4' /> Share
-                  </button>
-                )}
-
-                <button onClick={handleToggleClick} className=' flex items-center p-2 px-4 gap-2 text-xs bg-gradient-to-br from-purple-100 to-purple-200 text-purple-600 ring-purple-300 rounded-lg hover:ring transition-colors'>
-                  {resumeData.public ? <EyeIcon className=' size-4' /> : <EyeOffIcon className=' size-4' />}
-                  {resumeData.public ? 'Public' : 'Private'}
-                </button>
-
-                <button onClick={downloadResume} className=' flex items-center gap-2 px-6 py-2 text-xs bg-gradient-to-br from-green-100 to-green-200 text-green-600 rounded-lg ring-green-300 hover:ring transition-colors'>
-                  <DownloadIcon className=' size-4' /> Download
-                </button>
-              </div>
-            </ResumePreview>
+            />
 
           </div>
 
@@ -348,16 +354,19 @@ const ResumeBuilder = () => {
 
       {/* Custom Confirmation Modal */}
       {showVisibilityModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-xl border border-gray-100 animate-in zoom-in-95 duration-200">
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Make Resume Public?</h3>
-            <p className="text-sm text-gray-500 mb-6 leading-relaxed">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-[2px] animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl p-5 max-w-[340px] w-full mx-4 shadow-xl border border-slate-100 animate-in zoom-in-95 duration-200 text-center">
+            <div className="mx-auto w-12 h-12 bg-rose-50 rounded-full flex items-center justify-center mb-3">
+              <Share2Icon className="size-5 text-[#e52d27]" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-800 mb-1">Make Resume Public?</h3>
+            <p className="text-xs text-slate-500 mb-5 px-2 leading-relaxed">
               Making your resume public generates a link that anyone can access to view your details.
             </p>
-            <div className="flex justify-end gap-3">
+            <div className="flex gap-3">
               <button
                 onClick={() => setShowVisibilityModal(false)}
-                className="px-4 py-2 text-sm font-semibold text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                className="w-1/2 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200/60 text-slate-600 font-semibold rounded-xl transition-all text-xs"
               >
                 Cancel
               </button>
@@ -366,7 +375,7 @@ const ResumeBuilder = () => {
                   setShowVisibilityModal(false);
                   changeResumeVisility();
                 }}
-                className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-colors"
+                className="w-1/2 py-2 bg-gradient-to-r from-[#e52d27] to-[#b31217] hover:opacity-95 text-white font-semibold rounded-xl transition-all text-xs"
               >
                 Yes, Make Public
               </button>

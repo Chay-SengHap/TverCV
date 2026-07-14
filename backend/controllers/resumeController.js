@@ -11,13 +11,14 @@ import { sequelize } from "../db/database.js"
 export const createResume = async (req, res) => {
   try {
     const userId = req.userId; // Extracted from your working protect middleware
-    const { title } = req.body;
+    const { title, template } = req.body;
 
-    const newResume = await resumeRepository.createResume(userId, title);
+    const newResume = await resumeRepository.createResume(userId, title, template);
 
     return res.status(201).json({
       message: "Resume created successfully",
-      resume: newResume
+      resume: newResume,
+      resumeId: newResume.id
     });
 
   } catch (error) {

@@ -130,7 +130,7 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
         {data.professional_summary && (
           <section>
             <h2 className="text-[12px] font-bold uppercase tracking-[0.2em] mb-3.5 pl-3 border-l-2" style={{ borderColor: accentColor }}>
-              About Me
+              Professional Summary
             </h2>
             <p className="text-[13.5px] text-gray-600 leading-[1.8] text-justify">
               {data.professional_summary}

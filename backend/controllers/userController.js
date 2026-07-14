@@ -1,5 +1,5 @@
 import User from "../model/User.js";
-import {Resume} from "../model/Resume.js";
+import { Resume, PersonalInfo, Experience, Education, Project, Skill } from "../model/Relationship.js";
 import * as userRepository from "../repositories/sqlUserRepository.js";
 import jwt from 'jsonwebtoken'
 import { where } from "sequelize";
@@ -144,7 +144,14 @@ export const getUserResumes = async (req, res) => {
     const resumes = await Resume.findAll({
       where: {
         user_id: userId
-      }
+      },
+      include: [
+        { model: PersonalInfo, as: "personal_info" },
+        { model: Experience, as: "experiences" },
+        { model: Education, as: "education" },
+        { model: Project, as: "projects" },
+        { model: Skill, as: "skills" }
+      ]
     });
 
     return res.status(200).json({ resumes });

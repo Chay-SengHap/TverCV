@@ -37,7 +37,7 @@ export const resumeRouter = express.Router()
  *       500:
  *         description: Server error.
  */
-resumeRouter.post('/create' , protect, createResume )
+resumeRouter.post('/create', protect, createResume)
 
 /**
  * @swagger
@@ -64,7 +64,7 @@ resumeRouter.post('/create' , protect, createResume )
  *       500:
  *         description: Server error.
  */
-resumeRouter.post('/duplicate/:resumeId' , protect, duplicateResume )
+resumeRouter.post('/duplicate/:resumeId', protect, duplicateResume)
 
 /**
  * @swagger
@@ -98,7 +98,7 @@ resumeRouter.post('/duplicate/:resumeId' , protect, duplicateResume )
  *       500:
  *         description: Server error.
  */
-resumeRouter.put('/update' ,upload.single('image') , protect, updateResume )
+resumeRouter.put('/update', upload.single('image'), protect, updateResume)
 
 /**
  * @swagger
@@ -125,7 +125,7 @@ resumeRouter.put('/update' ,upload.single('image') , protect, updateResume )
  *       500:
  *         description: Server error.
  */
-resumeRouter.delete('/delete/:resumeId' , protect, deleteResume )
+resumeRouter.delete('/delete/:resumeId', protect, deleteResume)
 
 /**
  * @swagger
@@ -152,7 +152,7 @@ resumeRouter.delete('/delete/:resumeId' , protect, deleteResume )
  *       500:
  *         description: Server error.
  */
-resumeRouter.get('/get/:resumeId' , protect, getResumeById )
+resumeRouter.get('/get/:resumeId', protect, getResumeById)
 
 /**
  * @swagger
@@ -175,4 +175,4 @@ resumeRouter.get('/get/:resumeId' , protect, getResumeById )
  *       500:
  *         description: Server error.
  */
-resumeRouter.get('/public/:resumeId' ,getPublicResumeById)
+resumeRouter.get('/public/:resumeId', getPublicResumeById)

@@ -1,10 +1,11 @@
 import { Resume, PersonalInfo, Experience, Education, Project, Skill } from "../model/Relationship.js"
 
-export async function createResume(userId, title) {
+export async function createResume(userId, title, template) {
   try {
     const newResume = await Resume.create({
       user_id: userId,
-      title
+      title,
+      template: template || "classic"
     });
     return newResume;
   } catch (error) {

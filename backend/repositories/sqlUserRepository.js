@@ -63,19 +63,18 @@ export async function createUser(newUserData) {
 // Update a user by ID
 export async function updateUser(id, updatedData) {
   try {
-    const { email, password_hash, role } = updatedData;
-
-    const [affectedRows] = await User.update(
-      { email, password_hash, role },
-      { where: { id } }
-    );
-
-    if (affectedRows === 0) {
+    const user = await User.findByPk(id);
+    if (!user) {
       return null;
     }
 
-    const updatedUser = await User.findByPk(id);
-    return updatedUser;
+    if (updatedData.name !== undefined) user.name = updatedData.name;
+    if (updatedData.email !== undefined) user.email = updatedData.email;
+    if (updatedData.role !== undefined) user.role = updatedData.role;
+    if (updatedData.password !== undefined) user.password = updatedData.password;
+
+    await user.save();
+    return user;
   } catch (error) {
     console.error(error);
     throw error;

@@ -17,7 +17,12 @@ export const sequelize = new Sequelize(
         port: process.env.DB_PORT,
         dialect: "mysql",
         logging: false,
+        dialectOptions: {
+            ssl: {
+                rejectUnauthorized: false,
+            }
+        }
     }
 );
 
- console.log("DB URL:", JSON.stringify(process.env.DB_HOST))
+console.log("DB URL:", JSON.stringify(process.env.DB_HOST))

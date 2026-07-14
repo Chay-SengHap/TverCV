@@ -1,9 +1,134 @@
-import { FilePenLineIcon, LoaderCircleIcon, PencilIcon, PlusIcon, TrashIcon, UploadCloud, UploadCloudIcon, XIcon, FileTextIcon, CalendarIcon, Search, SlidersHorizontal, Eye, Lock, Globe, Sparkles, Copy } from 'lucide-react'
+import { FilePenLine, LoaderCircle, Pencil, Plus, Trash2, UploadCloud, X, FileText, Calendar, Search, SlidersHorizontal, Eye, Lock, Globe, Sparkles, Copy } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import api from '../config/api';
 import toast from 'react-hot-toast';
+import ResumePreview from '../components/ResumePreview';
+import { useRef } from 'react';
+
+const LazyResumePreview = ({ resume }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '100px' }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={containerRef}
+      className="w-28 h-36 bg-white overflow-hidden rounded border border-slate-200/50 shadow-sm flex items-start justify-center transition-transform group-hover:scale-[1.03] duration-300 relative"
+    >
+      {isVisible ? (
+        <ResumePreview
+          data={{
+            personal_info: resume.personal_info || {},
+            professional_summary: resume.professional_summary || "",
+            experience: (resume.experiences || []).slice(0, 2),
+            education: (resume.education || []).slice(0, 2),
+            project: (resume.projects || []).slice(0, 2),
+            skills: (resume.skills || []).slice(0, 6),
+          }}
+          template={resume.template}
+          accentColor={resume.accent_color}
+          mode="thumbnail"
+        />
+      ) : (
+        <div className="w-full h-full p-2 flex flex-col gap-1.5 animate-pulse bg-slate-50/20">
+          <div className="h-1 bg-slate-100 rounded-sm w-full" />
+          <div className="flex gap-1 items-center mt-1">
+            <div className="size-4.5 rounded-full bg-slate-100" />
+            <div className="flex flex-col gap-0.5 w-full">
+              <div className="h-1 bg-slate-100 rounded-sm w-3/4" />
+              <div className="h-0.5 bg-slate-50/50 rounded-sm w-1/2" />
+            </div>
+          </div>
+          <div className="h-[0.5px] bg-slate-100/50 w-full my-1" />
+          <div className="flex flex-col gap-1">
+            <div className="h-1 bg-slate-100 rounded-sm w-1/3" />
+            <div className="h-0.5 bg-slate-50/50 rounded-sm w-full" />
+            <div className="h-0.5 bg-slate-50/50 rounded-sm w-5/6" />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const dummyResumeData = {
+  personal_info: {
+    full_name: "Roth Sorayuth",
+    title: "Lead Full-Stack Software Engineer",
+    email: "rayuth@gmail.com",
+    phone: "0123456789",
+    location: "Phnom Penh, Cambodia",
+    linkedin: "linkedin.com/in/yuth-tech",
+    website: "rayuth.dev",
+    image_url: "https://ik.imagekit.io/3txkyljof/user-resume/resume-undefined.jpg?updatedAt=1783959324546"
+  },
+  professional_summary: "Results-driven Lead Full-Stack Software Engineer with over 6 years of experience designing, building, and deploying robust web applications. Proven track record of optimizing application performance, leading cross-functional developer teams, and implementing scalable cloud architectures. Passionate about writing clean, maintainable code and solving complex technical challenges.",
+  experience: [
+    { 
+      position: "Lead Full-Stack Developer", 
+      company: "InnovateTech Solutions", 
+      start_date: "2023-03", 
+      end_date: "", 
+      is_current: true, 
+      description: "• Architected and launched a micro-frontend platform, improving page load speeds by 40%.\n• Manage and mentor a team of 6 engineers, organizing agile sprints and performing daily code reviews.\n• Implemented secure JWT-based auth systems and automated CI/CD deployment pipelines on AWS." 
+    },
+    { 
+      position: "Senior Software Engineer", 
+      company: "Global Web Dynamics", 
+      start_date: "2020-06", 
+      end_date: "2023-02", 
+      is_current: false, 
+      description: "• Re-engineered database structures using PostgreSQL, decreasing query response times by 35%.\n• Developed reusable responsive UI component libraries using React and Tailwind CSS.\n• Collaborated closely with product managers to deliver weekly updates and hotfixes." 
+    }
+  ],
+  education: [
+    { 
+      degree: "M.S.", 
+      field: "Software Engineering", 
+      institution: "Stanford University", 
+      graduation_date: "2020-05" 
+    },
+    { 
+      degree: "B.S.", 
+      field: "Computer Science", 
+      institution: "University of California, Berkeley", 
+      graduation_date: "2018-05" 
+    }
+  ],
+  project: [
+    { 
+      name: "AI-Powered CV Platform", 
+      description: "Developed a full-stack resume builder integrating generative AI models to analyze, parse, and suggest structural optimization tips for uploaded PDF documents." 
+    },
+    { 
+      name: "Enterprise Task System", 
+      description: "Created a real-time collaborative workspace manager utilizing WebSockets, Redis, and React Redux, supporting over 10,000 active concurrent users." 
+    }
+  ],
+  skills: [
+    "JavaScript (ES6+)", "TypeScript", "React & Redux", "Node.js", "Express", "Python", 
+    "PostgreSQL", "MongoDB", "Docker", "AWS (S3, EC2)", "Git & CI/CD", "RESTful APIs"
+  ]
+};
 
 const Dashboard = () => {
   const { user, token } = useSelector(state => state.auth);
@@ -17,7 +142,11 @@ const Dashboard = () => {
   const [title, setTitle] = useState('');
   const [resume, setResume] = useState(null);
   const [editResumeId, setEditResumeId] = useState('');
+  const [deleteResumeId, setDeleteResumeId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [createStep, setCreateStep] = useState(1); // 1 = Title, 2 = Template Selection
+  const [selectedTemplate, setSelectedTemplate] = useState('classic');
+  const [previewTemplateId, setPreviewTemplateId] = useState(null);
   const navigate = useNavigate();
 
   const loadAllResumes = async () => {
@@ -35,8 +164,8 @@ const Dashboard = () => {
 
   const createResme = async (event) => {
     try {
-      event.preventDefault();
-      const { data } = await api.post('/api/resumes/create', { title }, {
+      if (event) event.preventDefault();
+      const { data } = await api.post('/api/resumes/create', { title, template: selectedTemplate }, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -44,8 +173,10 @@ const Dashboard = () => {
 
       setAllResumes([...allResumes, data.resume]);
       setTitle('');
+      setSelectedTemplate('classic');
+      setCreateStep(1);
       setShowCreateResume(false);
-      navigate(`/app/builder/${data.resumeId}`);
+      navigate(`/app/builder/${data.resumeId || data.resume.id}`);
       toast.success(data.message);
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to create resume");
@@ -113,16 +244,14 @@ const Dashboard = () => {
 
   const deleteResume = async (resumeId) => {
     try {
-      const confirm = window.confirm('Are you sure you want to delete this resume?');
-      if (confirm) {
-        const { data } = await api.delete(`/api/resumes/delete/${resumeId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        setAllResumes(allResumes.filter(r => r.id !== resumeId));
-        toast.success(data.message);
-      }
+      const { data } = await api.delete(`/api/resumes/delete/${resumeId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setAllResumes(allResumes.filter(r => r.id !== resumeId));
+      toast.success(data.message || "Resume deleted successfully");
+      setDeleteResumeId(null);
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to delete resume");
     }
@@ -146,6 +275,17 @@ const Dashboard = () => {
     loadAllResumes();
   }, []);
 
+  useEffect(() => {
+    if (showCreateResume || showUploadResume || previewTemplateId) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [showCreateResume, showUploadResume, previewTemplateId]);
+
   // Filter & Sort resumes list
   const filteredResumes = allResumes
     .filter(r => r.title.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -163,55 +303,57 @@ const Dashboard = () => {
     <div className="min-h-screen bg-slate-50/70 pb-16">
       <div className="max-w-7xl mx-auto px-6 py-8">
 
-        {/* Mesh Gradient Dashboard Banner Card */}
-        <div className="relative overflow-hidden bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-8 mb-10 text-white shadow-xl">
-          {/* Glass background details */}
-          <div className="absolute right-0 top-0 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute left-1/3 bottom-0 w-60 h-60 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+        {/* Minimalist Aurora Dashboard Banner Card */}
+        <div className="relative overflow-hidden bg-white border border-slate-200/80 rounded-2xl p-8 mb-10 shadow-sm">
+          {/* Brand red ambient glow in the top-right corner */}
+          <div className="absolute -right-20 -top-20 w-80 h-80 bg-gradient-to-br from-[#e52d27]/10 to-[#b31217]/10 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="relative z-10 max-w-2xl">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-xs font-semibold tracking-wide text-indigo-200 mb-4 border border-white/5">
-              <Sparkles className="size-3.5 text-indigo-300 animate-pulse" />
+          {/* Micro-grid pattern overlay */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#f1f5f9_1px,transparent_1px),linear-gradient(to_bottom,#f1f5f9_1px,transparent_1px)] bg-[size:20px_20px] opacity-100 pointer-events-none" />
+
+          <div className="relative z-10 max-w-3xl">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-[#e52d27]/8 to-[#b31217]/8 border border-[#e52d27]/15 rounded-full text-xs font-bold tracking-wide text-[#e52d27] mb-4">
+              <Sparkles className="size-3.5 text-[#e52d27] animate-pulse" />
               AI-Powered Workspace
             </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-800">
               Design Your Career Path, {user?.name?.split(' ')[0] || "Explorer"}
             </h1>
-            <p className="text-slate-300 text-sm sm:text-base mt-2.5 leading-relaxed font-light">
+            <p className="text-slate-500 text-sm sm:text-base mt-2.5 leading-relaxed font-light">
               Build polished, job-ready resumes, import existing PDF files to restructure them with AI assistance, or host public CV links online.
             </p>
           </div>
         </div>
 
         {/* Dashboard Statistics / Metrics widgets */}
-        <div className="grid grid-cols-3 gap-6 mb-10">
-          <div className="bg-white border border-slate-100/80 rounded-xl p-5 shadow-sm flex items-center justify-between">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+          <div className="bg-white border border-slate-200/60 rounded-2xl p-5 shadow-sm flex items-center justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Documents</p>
               <h3 className="text-2xl font-extrabold text-slate-800 mt-1">{allResumes.length}</h3>
             </div>
-            <div className="p-3 bg-purple-50 rounded-xl">
-              <FileTextIcon className="size-6 text-purple-600" />
+            <div className="p-3 bg-red-50 text-[#e52d27] rounded-xl">
+              <FileText className="size-6" />
             </div>
           </div>
 
-          <div className="bg-white border border-slate-100/80 rounded-xl p-5 shadow-sm flex items-center justify-between">
+          <div className="bg-white border border-slate-200/60 rounded-2xl p-5 shadow-sm flex items-center justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Public Links</p>
               <h3 className="text-2xl font-extrabold text-slate-800 mt-1">{publicCount}</h3>
             </div>
-            <div className="p-3 bg-emerald-50 rounded-xl">
-              <Globe className="size-6 text-emerald-600" />
+            <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
+              <Globe className="size-6" />
             </div>
           </div>
 
-          <div className="bg-white border border-slate-100/80 rounded-xl p-5 shadow-sm flex items-center justify-between">
+          <div className="bg-white border border-slate-200/60 rounded-2xl p-5 shadow-sm flex items-center justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Private Drafts</p>
               <h3 className="text-2xl font-extrabold text-slate-800 mt-1">{privateCount}</h3>
             </div>
-            <div className="p-3 bg-amber-50 rounded-xl">
-              <Lock className="size-6 text-amber-600" />
+            <div className="p-3 bg-slate-50 text-slate-500 rounded-xl">
+              <Lock className="size-6" />
             </div>
           </div>
         </div>
@@ -226,30 +368,31 @@ const Dashboard = () => {
             {/* Create Trigger */}
             <button
               onClick={() => setShowCreateResume(true)}
-              className="w-full text-left bg-gradient-to-br from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold p-5 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 group flex items-center justify-between"
+              className="w-full text-left bg-gradient-to-r from-[#e52d27] to-[#b31217] hover:opacity-90 text-white font-bold p-5 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 group flex items-center justify-between"
             >
               <div>
                 <h3 className="text-[15px]">Create Blank CV</h3>
-                <p className="text-[11px] text-indigo-100 font-light mt-0.5">Start fresh from scratch</p>
+                <p className="text-[11px] text-rose-100 font-light mt-0.5">Start fresh from scratch</p>
               </div>
               <div className="p-2 bg-white/10 rounded-xl group-hover:scale-110 transition-transform">
-                <PlusIcon className="size-5" />
+                <Plus className="size-5" />
               </div>
             </button>
 
             {/* Import Trigger */}
             <button
               onClick={() => setShowUploadResume(true)}
-              className="w-full text-left bg-white border border-slate-200/80 hover:border-indigo-200 text-slate-700 hover:text-slate-900 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 group flex items-center justify-between"
+              className="w-full text-left bg-white border border-slate-200/80 hover:border-red-200 text-slate-700 hover:text-slate-900 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 group flex items-center justify-between"
             >
               <div>
                 <h3 className="text-[15px] font-bold">Import Existing PDF</h3>
                 <p className="text-[11px] text-slate-400 font-light mt-0.5">Upload & parse using AI</p>
               </div>
-              <div className="p-2 bg-slate-50 border border-slate-100 rounded-xl group-hover:scale-110 transition-transform group-hover:bg-indigo-50">
-                <UploadCloudIcon className="size-5 text-slate-500 group-hover:text-indigo-600" />
+              <div className="p-2 bg-slate-50 border border-slate-100 rounded-xl group-hover:scale-110 transition-transform group-hover:bg-red-50">
+                <UploadCloud className="size-5 text-slate-500 group-hover:text-[#e52d27]" />
               </div>
             </button>
+
           </div>
 
           {/* Right Panel: Document Directory List */}
@@ -281,7 +424,7 @@ const Dashboard = () => {
                       type="button"
                       className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 p-1 hover:bg-slate-100 rounded-full transition-all"
                     >
-                      <XIcon className="size-3.5" />
+                      <X className="size-3.5" />
                     </button>
                   )}
                 </div>
@@ -304,7 +447,7 @@ const Dashboard = () => {
             {/* Resumes Grid */}
             {filteredResumes.length === 0 ? (
               <div className="bg-white border border-slate-100 rounded-2xl p-16 text-center shadow-sm">
-                <FileTextIcon className="size-12 text-slate-300 mx-auto mb-4" />
+                <FileText className="size-12 text-slate-300 mx-auto mb-4" />
                 <h3 className="text-lg font-bold text-slate-800">No Documents Found</h3>
                 <p className="text-sm text-slate-400 mt-1.5">No resume matches your current filter query.</p>
               </div>
@@ -316,38 +459,38 @@ const Dashboard = () => {
                     <div
                       key={resume.id}
                       onClick={() => navigate(`/app/builder/${resume.id}`)}
-                      className="group relative bg-white border border-slate-200/60 rounded-2xl shadow-sm hover:shadow-lg hover:border-indigo-300/55 transition-all duration-300 cursor-pointer overflow-hidden flex flex-col justify-between h-60"
+                      className="group relative bg-white border border-slate-200/60 rounded-2xl shadow-sm hover:shadow-lg hover:border-indigo-300/30 transition-all duration-300 cursor-pointer overflow-hidden flex flex-col justify-between h-72"
                     >
                       {/* Document Card Header Mini Mockup */}
-                      <div className="bg-slate-50 border-b border-slate-100 p-4 relative flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className="p-2 rounded-lg bg-white border border-slate-200/60 shadow-sm">
-                            <FileTextIcon className="size-5" style={{ color: baseColor }} />
-                          </div>
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-sans">
+                      <div className="bg-slate-50/70 border-b border-slate-100 p-4 h-44 relative flex items-center justify-center overflow-hidden">
+                        {/* The Mini CV sheet */}
+                        <LazyResumePreview resume={resume} />
+
+                        {/* Top badges floating over the preview area */}
+                        <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
+                          <span className="text-[9px] font-semibold uppercase tracking-wider text-slate-500 bg-white/90 backdrop-blur-sm border border-slate-100 px-2 py-0.5 rounded-md shadow-sm">
                             {resume.template || "Classic"}
                           </span>
-                        </div>
 
-                        {/* Public status badge */}
-                        {resume.is_public ? (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
-                            <Globe className="size-3" /> Public
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200/50">
-                            <Lock className="size-3" /> Draft
-                          </span>
-                        )}
+                          {resume.is_public ? (
+                            <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-600 bg-emerald-50/90 backdrop-blur-sm px-2 py-0.5 rounded-full border border-emerald-100/60 shadow-sm">
+                              <Globe className="size-2.5" /> Public
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 text-[9px] font-bold text-slate-400 bg-slate-50/90 backdrop-blur-sm px-2 py-0.5 rounded-full border border-slate-200/40 shadow-sm">
+                              <Lock className="size-2.5" /> Draft
+                            </span>
+                          )}
+                        </div>
                       </div>
 
                       {/* Card Content (Title) */}
-                      <div className="p-5 flex-1 flex flex-col justify-center">
-                        <h3 className="font-extrabold text-slate-800 text-base leading-snug truncate group-hover:text-indigo-600 transition-colors">
+                      <div className="p-4 flex flex-col justify-center">
+                        <h3 className="font-bold text-slate-800 text-sm leading-snug truncate group-hover:text-[#e52d27] transition-colors">
                           {resume.title}
                         </h3>
-                        <p className="text-slate-400 text-xs mt-1.5 flex items-center gap-1">
-                          <CalendarIcon className="size-3" />
+                        <p className="text-slate-400 text-[10px] mt-1 flex items-center gap-1">
+                          <Calendar className="size-3 text-slate-300" />
                           Edited {new Date(resume.updated_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                         </p>
                       </div>
@@ -360,17 +503,17 @@ const Dashboard = () => {
                             setEditResumeId(resume.id);
                             setTitle(resume.title);
                           }}
-                          className="p-3 bg-white hover:bg-indigo-50 border border-slate-200/60 text-slate-700 hover:text-indigo-600 shadow-md rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
+                          className="p-3 bg-white hover:bg-red-50 border border-slate-200/60 text-slate-700 hover:text-[#e52d27] shadow-md rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
                           title="Rename Document"
                         >
-                          <PencilIcon className="size-4" />
+                          <Pencil className="size-4" />
                         </button>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             duplicateResume(resume.id);
                           }}
-                          className="p-3 bg-white hover:bg-emerald-50 border border-slate-200/60 text-slate-700 hover:text-emerald-600 shadow-md rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
+                          className="p-3 bg-white hover:bg-red-50 border border-slate-200/60 text-slate-700 hover:text-[#e52d27] shadow-md rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
                           title="Duplicate Document"
                         >
                           <Copy className="size-4" />
@@ -378,12 +521,12 @@ const Dashboard = () => {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            deleteResume(resume.id);
+                            setDeleteResumeId(resume.id);
                           }}
-                          className="p-3 bg-white hover:bg-red-50 border border-slate-200/60 text-slate-700 hover:text-red-600 shadow-md rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
+                          className="p-3 bg-white hover:bg-red-50 border border-slate-200/60 text-slate-700 hover:text-[#e52d27] shadow-md rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
                           title="Delete Document"
                         >
-                          <TrashIcon className="size-4" />
+                          <Trash2 className="size-4" />
                         </button>
                       </div>
                     </div>
@@ -394,33 +537,112 @@ const Dashboard = () => {
           </div>
 
         </div>
-
         {/* Pop-up Modal for Create Resume */}
         {showCreateResume && (
           <div
-            onClick={() => setShowCreateResume(false)}
+            onClick={() => {
+              setShowCreateResume(false);
+              setTitle('');
+              setCreateStep(1);
+              setSelectedTemplate('classic');
+            }}
             className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all duration-300"
           >
-            <form
-              onSubmit={createResme}
+            <div
+              data-lenis-prevent
               onClick={(e) => e.stopPropagation()}
-              className="relative bg-white border border-slate-100 shadow-2xl rounded-2xl w-full max-w-md p-6 overflow-hidden"
+              className={`relative bg-white border border-slate-100 shadow-2xl rounded-2xl w-full p-6 transition-all duration-300 max-h-[90vh] overflow-y-auto ${
+                createStep === 1 ? 'max-w-md' : 'max-w-3xl'
+              }`}
             >
-              <h2 className="text-xl font-extrabold text-slate-800 mb-1.5">Create a Resume</h2>
-              <p className="text-xs text-slate-400 mb-5">Give your new resume a name to get started.</p>
+              {createStep === 1 ? (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (title.trim()) setCreateStep(2);
+                  }}
+                >
+                  <h2 className="text-xl font-extrabold text-slate-800 mb-1.5">Create a Resume</h2>
+                  <p className="text-xs text-slate-400 mb-5">Give your new resume a name to get started.</p>
 
-              <input
-                onChange={(e) => setTitle(e.target.value)}
-                value={title}
-                type="text"
-                placeholder="e.g. My Software Engineer Resume"
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl mb-5 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all text-sm"
-                required
-              />
+                  <input
+                    onChange={(e) => setTitle(e.target.value)}
+                    value={title}
+                    type="text"
+                    placeholder="e.g. My Software Engineer Resume"
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl mb-5 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-[#e52d27] transition-all text-sm"
+                    required
+                  />
 
-              <button className="w-full py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all text-sm">
-                Create Resume
-              </button>
+                  <button className="w-full py-2.5 bg-gradient-to-r from-[#e52d27] to-[#b31217] hover:opacity-90 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all text-sm">
+                    Next: Choose Template
+                  </button>
+                </form>
+              ) : (
+                <div>
+                  <h2 className="text-xl font-extrabold text-slate-800 mb-1">Select a Template</h2>
+                  <p className="text-xs text-slate-400 mb-5">Choose a design layout for <strong>{title}</strong>.</p>
+
+                  <div data-lenis-prevent className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6 max-h-[380px] overflow-y-auto p-1">
+                    {[
+                      { id: 'classic', name: 'Classic', preview: 'border-t-4 border-slate-700 bg-white' },
+                      { id: 'modern', name: 'Modern Side', preview: 'border-l-4 border-indigo-600 bg-slate-50' },
+                      { id: 'minimal-image', name: 'Minimal Image', preview: 'border-t-4 border-slate-400 bg-slate-50 flex-col-reverse justify-end' },
+                      { id: 'minimal', name: 'Minimal', preview: 'border border-slate-200 bg-white' },
+                      { id: 'executive', name: 'Executive', preview: 'border-t-4 border-emerald-600 bg-slate-50' },
+                      { id: 'creative', name: 'Creative', preview: 'border-l-4 border-rose-500 bg-rose-50/20' },
+                      { id: 'modern-right', name: 'Modern Right', preview: 'border-r-4 border-indigo-600 bg-slate-50' },
+                      { id: 'academic', name: 'Academic/CV', preview: 'border border-dashed border-slate-300 bg-white' },
+                    ].map((tpl) => (
+                      <div
+                        key={tpl.id}
+                        onClick={() => setSelectedTemplate(tpl.id)}
+                        className={`group relative p-2.5 rounded-xl border-2 transition-all cursor-pointer flex flex-col justify-between h-56 ${
+                          selectedTemplate === tpl.id
+                            ? 'border-[#e52d27] bg-red-50/20 shadow-md ring-2 ring-red-500/10'
+                            : 'border-slate-200 hover:border-slate-300 hover:shadow bg-white'
+                        }`}
+                      >
+                        {/* Live Template Preview Area */}
+                        <div className="w-full h-40 rounded-lg shadow-sm overflow-hidden flex items-start justify-center bg-slate-50 border border-slate-100 relative group/preview">
+                          <div className="w-full h-full pointer-events-none">
+                            <ResumePreview
+                              data={dummyResumeData}
+                              template={tpl.id}
+                              accentColor="#3B82F6"
+                              mode="thumbnail"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Template Label */}
+                        <div className="mt-1 flex items-center justify-between">
+                          <span className="text-[11px] font-bold text-slate-700 truncate mr-1">{tpl.name}</span>
+                          {selectedTemplate === tpl.id && (
+                            <span className="size-2 rounded-full bg-[#e52d27] flex-shrink-0" />
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex gap-3 justify-end">
+                    <button
+                      type="button"
+                      onClick={() => setCreateStep(1)}
+                      className="px-5 py-2 border border-slate-200 rounded-xl text-slate-500 hover:bg-slate-50 active:scale-95 transition-all text-xs font-semibold"
+                    >
+                      Back
+                    </button>
+                    <button
+                      onClick={() => createResme()}
+                      className="px-6 py-2 bg-gradient-to-r from-[#e52d27] to-[#b31217] hover:opacity-90 text-white font-bold rounded-xl shadow-md hover:shadow-lg active:scale-95 transition-all text-xs"
+                    >
+                      Create Resume
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <button
                 type="button"
@@ -428,13 +650,17 @@ const Dashboard = () => {
                 onClick={() => {
                   setShowCreateResume(false);
                   setTitle('');
+                  setCreateStep(1);
+                  setSelectedTemplate('classic');
                 }}
               >
-                <XIcon className="size-5" />
+                <X className="size-5" />
               </button>
-            </form>
+            </div>
           </div>
         )}
+
+
 
         {/* Pop-up Modal for Upload Resume */}
         {showUploadResume && (
@@ -455,7 +681,7 @@ const Dashboard = () => {
                 value={title}
                 type="text"
                 placeholder="e.g. Imported Senior Developer CV"
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl mb-4 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-[#e52d27] transition-all text-sm"
                 required
               />
 
@@ -463,13 +689,13 @@ const Dashboard = () => {
                 <label htmlFor="resume-input" className="block text-xs font-semibold text-slate-500 mb-2">Select resume file</label>
                 <label
                   htmlFor="resume-input"
-                  className="flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-xl p-6 mb-5 hover:border-blue-500 hover:bg-blue-50/10 cursor-pointer transition-colors group"
+                  className="flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-xl p-6 mb-5 hover:border-red-500 hover:bg-red-50/10 cursor-pointer transition-colors group"
                 >
                   {resume ? (
-                    <p className="text-sm font-bold text-blue-600 break-all">{resume.name}</p>
+                    <p className="text-sm font-bold text-[#e52d27] break-all">{resume.name}</p>
                   ) : (
                     <>
-                      <UploadCloud className="size-10 stroke-1 text-slate-400 group-hover:text-blue-500 transition-colors mb-2" />
+                      <UploadCloud className="size-10 stroke-1 text-slate-400 group-hover:text-[#e52d27] transition-colors mb-2" />
                       <p className="text-xs text-slate-500">Choose a PDF file to upload</p>
                     </>
                   )}
@@ -485,9 +711,9 @@ const Dashboard = () => {
 
               <button
                 disabled={isLoading}
-                className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-slate-400 disabled:to-slate-500 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all text-sm flex items-center justify-center gap-2"
+                className="w-full py-2.5 bg-gradient-to-r from-[#e52d27] to-[#b31217] hover:opacity-90 disabled:from-slate-400 disabled:to-slate-500 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all text-sm flex items-center justify-center gap-2"
               >
-                {isLoading && <LoaderCircleIcon className="animate-spin size-4 text-white" />}
+                {isLoading && <LoaderCircle className="animate-spin size-4 text-white" />}
                 {isLoading ? 'Uploading & Parsing...' : 'Import Resume'}
               </button>
 
@@ -500,7 +726,7 @@ const Dashboard = () => {
                   setResume(null);
                 }}
               >
-                <XIcon className="size-5" />
+                <X className="size-5" />
               </button>
             </form>
           </div>
@@ -525,11 +751,11 @@ const Dashboard = () => {
                 value={title}
                 type="text"
                 placeholder="Enter resume title"
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl mb-5 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all text-sm"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl mb-5 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-[#e52d27] transition-all text-sm"
                 required
               />
 
-              <button className="w-full py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all text-sm">
+              <button className="w-full py-2.5 bg-gradient-to-r from-[#e52d27] to-[#b31217] hover:opacity-90 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all text-sm">
                 Rename Resume
               </button>
 
@@ -541,9 +767,49 @@ const Dashboard = () => {
                   setTitle('');
                 }}
               >
-                <XIcon className="size-5" />
+                <X className="size-5" />
               </button>
             </form>
+          </div>
+        )}
+
+        {/* Pop-up Modal for Delete Confirmation */}
+        {deleteResumeId && (
+          <div
+            onClick={() => setDeleteResumeId(null)}
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] z-50 flex items-center justify-center p-4 transition-all duration-300"
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="relative bg-white border border-slate-100 shadow-xl rounded-2xl w-full max-w-[340px] p-5 text-center overflow-hidden"
+            >
+              <div className="mx-auto w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mb-3">
+                <Trash2 className="size-5 text-[#e52d27]" />
+              </div>
+              <h2 className="text-lg font-bold text-slate-800 mb-1">
+                Delete Resume
+              </h2>
+              <p className="text-xs text-slate-500 mb-5 px-2 leading-relaxed">
+                Are you sure you want to delete this resume?
+              </p>
+
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setDeleteResumeId(null)}
+                  className="w-1/2 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200/60 text-slate-600 font-semibold rounded-xl transition-all text-xs"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => deleteResume(deleteResumeId)}
+                  className="w-1/2 py-2 bg-gradient-to-r from-[#e52d27] to-[#b31217] hover:opacity-95 text-white font-semibold rounded-xl transition-all text-xs"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
