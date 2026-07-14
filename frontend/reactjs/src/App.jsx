@@ -1,5 +1,5 @@
 // import Banner from "./components/Banner";
-import LenisScroll from "./components/Lenis-scroll.jsx";
+import LenisScroll from "./components/lenis-scroll.jsx";
 // import Navbar from "./components/Navbar";
 // import Footer from "./components/Footer";
 
