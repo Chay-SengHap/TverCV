@@ -8,4 +8,7 @@ export default defineConfig({
   resolve: {
     dedupe: ['react', 'react-dom'],
   },
+  preview: {
+    allowedHosts: ["tvercv-production-bd31.up.railway.app"]
+  }
 })
