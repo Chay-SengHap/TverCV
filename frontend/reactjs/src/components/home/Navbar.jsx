@@ -47,7 +47,7 @@ export default function Navbar() {
         <>
             <nav className='sticky top-0 z-50 flex w-full items-center justify-between bg-white/85 px-4 py-3.5 backdrop-blur-md border-b border-slate-100 md:px-8 lg:px-16'>
                 <a href='#home' className="flex items-center">
-                    <img src='/assets/logoTverCv.png' alt='logo' className='h-8 w-auto' />
+                    <img src='https://ik.imagekit.io/3txkyljof/user-resume/logoTverCv.png' alt='logo' className='h-8 w-auto' />
                 </a>
 
                 <div className='hidden items-center space-x-8 md:flex'>
