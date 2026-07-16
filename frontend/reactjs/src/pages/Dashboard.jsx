@@ -279,6 +279,7 @@ const Dashboard = () => {
     if (token) {
       loadAllResumes();
     }
+    localStorage.removeItem('lastActiveResumeBuilder');
   }, [token]);
 
   useEffect(() => {
@@ -613,8 +614,8 @@ const Dashboard = () => {
                         key={tpl.id}
                         onClick={() => setSelectedTemplate(tpl.id)}
                         className={`group relative p-2.5 rounded-xl border-2 transition-all cursor-pointer flex flex-col justify-between h-56 ${selectedTemplate === tpl.id
-                            ? 'border-[#e52d27] bg-red-50/20 shadow-md ring-2 ring-red-500/10'
-                            : 'border-slate-200 hover:border-slate-300 hover:shadow bg-white'
+                          ? 'border-[#e52d27] bg-red-50/20 shadow-md ring-2 ring-red-500/10'
+                          : 'border-slate-200 hover:border-slate-300 hover:shadow bg-white'
                           }`}
                       >
                         {/* Live Template Preview Area */}

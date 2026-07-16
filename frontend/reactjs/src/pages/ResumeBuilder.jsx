@@ -10,7 +10,8 @@ import ExperienceForm from '../components/ExperienceForm';
 import EducationForm from '../components/EducationForm';
 import ProjectForm from '../components/ProjectForm';
 import SkillsForm from '../components/SkillsForm';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { logout } from '../app/features/authSlice';
 import api from '../config/api';
 import toast from 'react-hot-toast'
 
@@ -21,6 +22,7 @@ const ResumeBuilder = () => {
 
   const { token } = useSelector(state => state.auth);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [activeTab, setActiveTab] = useState('edit') // 'edit' or 'preview'
 
@@ -65,6 +67,7 @@ const ResumeBuilder = () => {
 
         setResumeData(mappedData);
         setLastSavedData(JSON.parse(JSON.stringify(mappedData)));
+        localStorage.setItem('lastActiveResumeBuilder', `/app/builder/${resumeId}`);
 
         document.title = dbResume.title || "Resume Builder";
       }
@@ -90,20 +93,70 @@ const ResumeBuilder = () => {
 
   const activateSection = sections[activeSectionIndex]
 
+  const [showVisibilityModal, setShowVisibilityModal] = useState(false);
+  const [showBackConfirmModal, setShowBackConfirmModal] = useState(false);
+  const [lastSavedData, setLastSavedData] = useState(null);
+  const [navTarget, setNavTarget] = useState('/app');
+
   useEffect(() => {
     loadExistingResume();
   }, []);
 
-  const [showVisibilityModal, setShowVisibilityModal] = useState(false);
-  const [showBackConfirmModal, setShowBackConfirmModal] = useState(false);
-  const [lastSavedData, setLastSavedData] = useState(null);
+  useEffect(() => {
+    if (lastSavedData) {
+      window.resumeBuilderDirty = JSON.stringify(resumeData) !== JSON.stringify(lastSavedData);
+    } else {
+      window.resumeBuilderDirty = false;
+    }
+    return () => {
+      window.resumeBuilderDirty = false;
+    };
+  }, [resumeData, lastSavedData]);
+
+  useEffect(() => {
+    const handleShowConfirm = (e) => {
+      setNavTarget(e.detail.targetUrl);
+      setShowBackConfirmModal(true);
+    };
+    window.addEventListener('show-leave-builder-confirm', handleShowConfirm);
+    return () => {
+      window.removeEventListener('show-leave-builder-confirm', handleShowConfirm);
+    };
+  }, []);
 
   const handleBackToDashboard = () => {
     if (lastSavedData && JSON.stringify(resumeData) === JSON.stringify(lastSavedData)) {
       navigate('/app');
     } else {
+      setNavTarget('/app');
       setShowBackConfirmModal(true);
     }
+  };
+
+  const handleSaveAndLeave = async () => {
+    setShowBackConfirmModal(false);
+    
+    await toast.promise(
+      (async () => {
+        const success = await saveResume();
+        if (success) {
+          window.resumeBuilderDirty = false;
+          if (navTarget === '/logout') {
+            dispatch(logout());
+            navigate('/');
+          } else {
+            navigate(navTarget);
+          }
+        } else {
+          throw new Error("Failed to save changes");
+        }
+      })(),
+      {
+        loading: 'Saving and leaving...',
+        success: 'Saved and exited successfully!',
+        error: 'Could not save changes. Please try again.'
+      }
+    );
   };
 
   const changeResumeVisility = async () => {
@@ -117,7 +170,9 @@ const ResumeBuilder = () => {
           Authorization: `Bearer ${token}`
         }
       })
-      setResumeData({ ...resumeData, public: !resumeData.public })
+      const newVisibility = !resumeData.public;
+      setResumeData(prev => ({ ...prev, public: newVisibility }));
+      setLastSavedData(prev => ({ ...prev, public: newVisibility }));
       toast.success(data.message)
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to update visibility")
@@ -202,16 +257,18 @@ const ResumeBuilder = () => {
       setResumeData(savedResume);
       setLastSavedData(JSON.parse(JSON.stringify(savedResume)));
       toast.success(data.message)
+      return true;
     } catch (error) {
       toast.error(error)
+      return false;
     }
   }
 
   return (
     <>
       <div className=" max-w-7xl mx-auto px-4 py-6 flex items-center justify-between gap-4 flex-wrap">
-        <button 
-          onClick={handleBackToDashboard} 
+        <button
+          onClick={handleBackToDashboard}
           className="inline-flex gap-2 items-center text-slate-500 hover:text-slate-700 transition-colors duration-200 cursor-pointer"
         >
           <ArrowLeftIcon className='size-4' /> Back to Dashboard
@@ -227,8 +284,8 @@ const ResumeBuilder = () => {
           <button
             onClick={handleToggleClick}
             className={`flex items-center p-2 px-4 gap-2 text-xs rounded-lg transition-colors ${resumeData.public
-                ? 'bg-gradient-to-br from-purple-100 to-purple-200 text-purple-600 ring-purple-300 hover:ring'
-                : 'bg-rose-50 border border-rose-100/50 text-[#e52d27] hover:bg-rose-100/50'
+              ? 'bg-gradient-to-br from-purple-100 to-purple-200 text-purple-600 ring-purple-300 hover:ring'
+              : 'bg-rose-50 border border-rose-100/50 text-[#e52d27] hover:bg-rose-100/50'
               }`}
           >
             {resumeData.public ? <EyeIcon className=' size-4' /> : <EyeOffIcon className=' size-4' />}
@@ -408,29 +465,41 @@ const ResumeBuilder = () => {
       {/* Custom Back to Dashboard Confirmation Modal */}
       {showBackConfirmModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-[2px] animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl p-5 max-w-[340px] w-full mx-4 shadow-xl border border-slate-100 animate-in zoom-in-95 duration-200 text-center">
-            <div className="mx-auto w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center mb-3">
-              <LogOut className="size-5 text-amber-500 animate-pulse scale-x-[-1]" />
+          <div className="bg-white rounded-2xl p-6 max-w-[340px] w-full mx-4 shadow-xl border border-slate-100 animate-in zoom-in-95 duration-200 text-center">
+            <div className="mx-auto w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mb-3">
+              <LogOut className="size-5 text-[#e52d27] animate-pulse scale-x-[-1]" />
             </div>
-            <h3 className="text-lg font-bold text-slate-800 mb-1">Leave Builder?</h3>
+            <h3 className="text-lg font-bold text-slate-800 mb-1">Unsaved Changes</h3>
             <p className="text-xs text-slate-500 mb-5 px-2 leading-relaxed">
-              Any unsaved changes will be lost. Make sure you click "Save Changes" before leaving.
+              You have unsaved edits in your CV. Would you like to save them before leaving?
             </p>
-            <div className="flex gap-3">
+            <div className="flex flex-col gap-2">
               <button
-                onClick={() => setShowBackConfirmModal(false)}
-                className="w-1/2 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200/60 text-slate-600 font-semibold rounded-xl transition-all text-xs cursor-pointer"
+                onClick={handleSaveAndLeave}
+                className="w-full py-2.5 bg-gradient-to-r from-[#e52d27] to-[#b31217] hover:opacity-95 text-white font-bold rounded-xl transition-all text-xs cursor-pointer shadow-sm hover:shadow"
               >
-                Keep Editing
+                Save & Leave
               </button>
               <button
                 onClick={() => {
                   setShowBackConfirmModal(false);
-                  navigate('/app');
+                  window.resumeBuilderDirty = false;
+                  if (navTarget === '/logout') {
+                    dispatch(logout());
+                    navigate('/');
+                  } else {
+                    navigate(navTarget);
+                  }
                 }}
-                className="w-1/2 py-2 bg-gradient-to-r from-[#e52d27] to-[#b31217] hover:opacity-95 text-white font-semibold rounded-xl transition-all text-xs cursor-pointer"
+                className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200/60 text-slate-600 font-semibold rounded-xl transition-all text-xs cursor-pointer"
               >
-                Yes, Leave
+                Discard & Leave
+              </button>
+              <button
+                onClick={() => setShowBackConfirmModal(false)}
+                className="w-full py-2 text-slate-400 hover:text-slate-600 font-medium transition-all text-xs cursor-pointer mt-1"
+              >
+                Keep Editing
               </button>
             </div>
           </div>

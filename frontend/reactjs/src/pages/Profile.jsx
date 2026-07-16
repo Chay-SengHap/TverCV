@@ -56,7 +56,7 @@ const Profile = () => {
           Authorization: `Bearer ${token}`
         }
       });
-      
+
       // Update redux state with new user data
       dispatch(login({ token, user: data }));
       toast.success("Profile updated successfully!");
@@ -85,7 +85,7 @@ const Profile = () => {
           Authorization: `Bearer ${token}`
         }
       });
-      
+
       toast.success("Password updated successfully!");
       setPassword('');
       setConfirmPassword('');
@@ -103,33 +103,44 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-slate-50/40 pb-20">
       <div className="max-w-5xl mx-auto px-6 py-8">
-        
+
         {/* Back Link Navigation */}
-        <div className="mb-8">
-          <Link 
-            to="/app" 
+        <div className="mb-8 flex items-center gap-4 flex-wrap">
+          <Link
+            to="/app"
             className="inline-flex items-center gap-2 text-xs font-medium text-slate-400 hover:text-slate-700 transition-colors group"
           >
             <ArrowLeft className="size-3.5 group-hover:-translate-x-0.5 transition-transform" />
             Back to Dashboard
           </Link>
+          {localStorage.getItem('lastActiveResumeBuilder') && (
+            <>
+              <span className="text-slate-300">|</span>
+              <Link 
+                to={localStorage.getItem('lastActiveResumeBuilder')} 
+                className="inline-flex items-center gap-2 text-xs font-medium text-[#e52d27] hover:opacity-85 transition-all duration-200 group"
+              >
+                Back to Resume Builder
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Unified Profile Banner (Horizontal layout - no heavy borders) */}
         <div className="bg-white border border-slate-100 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 mb-8 relative overflow-hidden">
           {/* Subtle brand aurora effect */}
           <div className="absolute -top-12 -left-12 w-32 h-32 bg-[#e52d27]/5 rounded-full blur-2xl pointer-events-none" />
-          
+
           <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left z-10">
             {/* Avatar Circle */}
             <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#e52d27] to-[#b31217] flex items-center justify-center text-white text-xl font-semibold shadow-sm">
               {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
             </div>
-            
+
             <div>
               <h1 className="text-xl font-bold text-slate-800 tracking-tight">{user?.name}</h1>
               <p className="text-xs text-slate-400 font-light mt-0.5">{user?.email}</p>
-              
+
               <div className="mt-2.5 inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-rose-50/60 rounded-full text-[10px] font-semibold text-[#e52d27]">
                 <Sparkles className="size-3" />
                 {user?.role || 'User'} Account
@@ -158,17 +169,16 @@ const Profile = () => {
 
         {/* Dashboard Panels Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-start">
-          
+
           {/* Left Panel: Desktop Sidebar settings navigation (hidden on mobile) */}
           <div className="hidden md:flex md:flex-col gap-2">
             <h3 className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 px-3 mb-2">Settings Menu</h3>
             <button
               onClick={() => setActiveTab('profile')}
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
-                activeTab === 'profile'
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${activeTab === 'profile'
                   ? 'bg-rose-50/60 text-[#e52d27]'
                   : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/50'
-              }`}
+                }`}
             >
               <div className="flex items-center gap-2.5">
                 <User className="size-4" />
@@ -179,11 +189,10 @@ const Profile = () => {
 
             <button
               onClick={() => setActiveTab('security')}
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
-                activeTab === 'security'
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${activeTab === 'security'
                   ? 'bg-rose-50/60 text-[#e52d27]'
                   : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/50'
-              }`}
+                }`}
             >
               <div className="flex items-center gap-2.5">
                 <Shield className="size-4" />
@@ -195,17 +204,16 @@ const Profile = () => {
 
           {/* Right Panel: Aesthetic Form Container (contains top tabs on mobile) */}
           <div className="md:col-span-3 bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-sm flex flex-col">
-            
+
             {/* Tab Selector Buttons (Mobile only - inside the upper form box) */}
             <div className="flex md:hidden border-b border-slate-100 bg-slate-50/50">
               <button
                 type="button"
                 onClick={() => setActiveTab('profile')}
-                className={`flex-1 py-3 text-xs font-semibold uppercase tracking-wider border-b-2 text-center transition-all flex items-center justify-center gap-2 ${
-                  activeTab === 'profile'
+                className={`flex-1 py-3 text-xs font-semibold uppercase tracking-wider border-b-2 text-center transition-all flex items-center justify-center gap-2 ${activeTab === 'profile'
                     ? 'border-[#e52d27] text-[#e52d27] bg-white'
                     : 'border-transparent text-slate-400 hover:text-slate-600 hover:bg-slate-50/20'
-                }`}
+                  }`}
               >
                 <User className="size-3.5" />
                 Profile Info
@@ -213,11 +221,10 @@ const Profile = () => {
               <button
                 type="button"
                 onClick={() => setActiveTab('security')}
-                className={`flex-1 py-3 text-xs font-semibold uppercase tracking-wider border-b-2 text-center transition-all flex items-center justify-center gap-2 ${
-                  activeTab === 'security'
+                className={`flex-1 py-3 text-xs font-semibold uppercase tracking-wider border-b-2 text-center transition-all flex items-center justify-center gap-2 ${activeTab === 'security'
                     ? 'border-[#e52d27] text-[#e52d27] bg-white'
                     : 'border-transparent text-slate-400 hover:text-slate-600 hover:bg-slate-50/20'
-                }`}
+                  }`}
               >
                 <Shield className="size-3.5" />
                 Password
@@ -230,8 +237,8 @@ const Profile = () => {
                 {activeTab === 'profile' ? 'Profile Details' : 'Change Password'}
               </h2>
               <p className="text-xs text-slate-400 mb-6 font-light">
-                {activeTab === 'profile' 
-                  ? 'Update your personal profile information here.' 
+                {activeTab === 'profile'
+                  ? 'Update your personal profile information here.'
                   : 'Choose a strong, unique password to secure your account.'}
               </p>
 

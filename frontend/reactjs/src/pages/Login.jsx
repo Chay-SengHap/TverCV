@@ -1,5 +1,5 @@
-import { Lock, Mail, User2Icon, ArrowLeft } from 'lucide-react'
-import React from 'react'
+import { Lock, Mail, User2Icon, ArrowLeft, Eye, EyeOff } from 'lucide-react'
+import React, { useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { login } from '../app/features/authSlice.js';
@@ -11,9 +11,10 @@ export const Login = () => {
   const navigate = useNavigate()
   const query = new URLSearchParams(window.location.search);
   const urlState = query.get('state')
-  const [state, setState] = React.useState(urlState || "login")
+  const [state, setState] = useState(urlState || "login")
+  const [showPassword, setShowPassword] = useState(false)
 
-  const [formData, setFormData] = React.useState({
+  const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: ''
@@ -62,9 +63,24 @@ export const Login = () => {
           <Mail size={13} color='#6b7280'/>
           <input type="email" name="email" placeholder="Email id" className="border-none outline-none ring-0" value={formData.email} onChange={handleChange} required />
         </div>
-        <div className="flex items-center mt-4 w-full bg-white border border-gray-300/80 h-12 rounded-full overflow-hidden pl-6 gap-2">
+        <div className="flex items-center mt-4 w-full bg-white border border-gray-300/80 h-12 rounded-full overflow-hidden pl-6 pr-4 gap-2">
           <Lock size={13} color='#6b7280'/>
-          <input type="password" name="password" placeholder="Password" className="border-none outline-none ring-0" value={formData.password} onChange={handleChange} required />
+          <input 
+            type={showPassword ? "text" : "password"} 
+            name="password" 
+            placeholder="Password" 
+            className="border-none outline-none ring-0 flex-1 min-w-0" 
+            value={formData.password} 
+            onChange={handleChange} 
+            required 
+          />
+          <button 
+            type="button" 
+            onClick={() => setShowPassword(!showPassword)} 
+            className="text-gray-400 hover:text-gray-600 focus:outline-none transition-colors ml-1"
+          >
+            {showPassword ? <Eye size={15} /> : <EyeOff size={15} />}
+          </button>
         </div>
 
         <button type="submit" className="mt-2 w-full h-11 rounded-full text-white bg-red-500 hover:opacity-90 transition-opacity">
