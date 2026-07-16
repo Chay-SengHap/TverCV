@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { data, Link, useParams } from 'react-router-dom';
-import { ArrowLeftIcon, User, FileText, Briefcase, GraduationCap, FolderIcon, Sparkles, ChevronLeft, ChevronRight, Share2Icon, EyeIcon, EyeOffIcon, DownloadIcon } from 'lucide-react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { ArrowLeftIcon, User, FileText, Briefcase, GraduationCap, FolderIcon, Sparkles, ChevronLeft, ChevronRight, Share2Icon, EyeIcon, EyeOffIcon, DownloadIcon, LogOut } from 'lucide-react';
 import PersonalInfoForm from '../components/PersonalInfoForm';
 import ResumePreview from '../components/ResumePreview';
 import TemplateSelector from '../components/TemplateSelector';
@@ -19,7 +19,8 @@ const ResumeBuilder = () => {
 
   const { resumeId } = useParams();
 
-  const { token } = useSelector(state => state.auth)
+  const { token } = useSelector(state => state.auth);
+  const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState('edit') // 'edit' or 'preview'
 
@@ -48,8 +49,7 @@ const ResumeBuilder = () => {
       if (data.resume) {
         const dbResume = data.resume;
 
-        // Map relational database arrays safely into your local state
-        setResumeData({
+        const mappedData = {
           _id: dbResume.id,
           title: dbResume.title || "",
           personal_info: dbResume.personal_info || {},
@@ -61,7 +61,10 @@ const ResumeBuilder = () => {
           template: dbResume.template || "classic",
           accent_color: dbResume.accent_color || "#3882F6",
           public: dbResume.is_public || false,
-        });
+        };
+
+        setResumeData(mappedData);
+        setLastSavedData(JSON.parse(JSON.stringify(mappedData)));
 
         document.title = dbResume.title || "Resume Builder";
       }
@@ -92,6 +95,16 @@ const ResumeBuilder = () => {
   }, []);
 
   const [showVisibilityModal, setShowVisibilityModal] = useState(false);
+  const [showBackConfirmModal, setShowBackConfirmModal] = useState(false);
+  const [lastSavedData, setLastSavedData] = useState(null);
+
+  const handleBackToDashboard = () => {
+    if (lastSavedData && JSON.stringify(resumeData) === JSON.stringify(lastSavedData)) {
+      navigate('/app');
+    } else {
+      setShowBackConfirmModal(true);
+    }
+  };
 
   const changeResumeVisility = async () => {
     try {
@@ -172,18 +185,22 @@ const ResumeBuilder = () => {
           Authorization: `Bearer ${token}`
         }
       });
-      setResumeData(prev => ({
-        ...prev,
+      const savedResume = {
+        _id: data.resume.id,
+        title: data.resume.title || resumeData.title,
         personal_info: data.resume.personal_info || {},
         professional_summary: data.resume.professional_summary || "",
         experience: data.resume.experiences || [],
         education: data.resume.education || [],
         project: data.resume.projects || [],
         skills: data.resume.skills || [],
-        template: data.resume.template || prev.template,
-        accent_color: data.resume.accent_color || prev.accent_color,
-        public: data.resume.is_public ?? prev.public,
-      }))
+        template: data.resume.template || resumeData.template,
+        accent_color: data.resume.accent_color || resumeData.accent_color,
+        public: data.resume.is_public ?? resumeData.public,
+      };
+
+      setResumeData(savedResume);
+      setLastSavedData(JSON.parse(JSON.stringify(savedResume)));
       toast.success(data.message)
     } catch (error) {
       toast.error(error)
@@ -193,9 +210,12 @@ const ResumeBuilder = () => {
   return (
     <>
       <div className=" max-w-7xl mx-auto px-4 py-6 flex items-center justify-between gap-4 flex-wrap">
-        <Link to={'/app'} className=" inline-flex gap-2 items-center text-slate-500 hover:text-slate-700 tranall">
-          <ArrowLeftIcon className=' size-4' /> Back to Dashboard
-        </Link>
+        <button 
+          onClick={handleBackToDashboard} 
+          className="inline-flex gap-2 items-center text-slate-500 hover:text-slate-700 transition-colors duration-200 cursor-pointer"
+        >
+          <ArrowLeftIcon className='size-4' /> Back to Dashboard
+        </button>
 
         <div className='flex items-center gap-2'>
           {resumeData.public && (
@@ -379,6 +399,38 @@ const ResumeBuilder = () => {
                 className="w-1/2 py-2 bg-gradient-to-r from-[#e52d27] to-[#b31217] hover:opacity-95 text-white font-semibold rounded-xl transition-all text-xs"
               >
                 Yes, Make Public
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Back to Dashboard Confirmation Modal */}
+      {showBackConfirmModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-[2px] animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl p-5 max-w-[340px] w-full mx-4 shadow-xl border border-slate-100 animate-in zoom-in-95 duration-200 text-center">
+            <div className="mx-auto w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center mb-3">
+              <LogOut className="size-5 text-amber-500 animate-pulse scale-x-[-1]" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-800 mb-1">Leave Builder?</h3>
+            <p className="text-xs text-slate-500 mb-5 px-2 leading-relaxed">
+              Any unsaved changes will be lost. Make sure you click "Save Changes" before leaving.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowBackConfirmModal(false)}
+                className="w-1/2 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200/60 text-slate-600 font-semibold rounded-xl transition-all text-xs cursor-pointer"
+              >
+                Keep Editing
+              </button>
+              <button
+                onClick={() => {
+                  setShowBackConfirmModal(false);
+                  navigate('/app');
+                }}
+                className="w-1/2 py-2 bg-gradient-to-r from-[#e52d27] to-[#b31217] hover:opacity-95 text-white font-semibold rounded-xl transition-all text-xs cursor-pointer"
+              >
+                Yes, Leave
               </button>
             </div>
           </div>
