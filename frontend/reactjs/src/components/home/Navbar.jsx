@@ -1,8 +1,10 @@
-import { MenuIcon, XIcon } from 'lucide-react';
+import { MenuIcon, XIcon, ArrowRightIcon } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 export default function Navbar() {
+    const { user } = useSelector((state) => state.auth);
     const [isOpen, setIsOpen] = useState(false);
     const [activeSection, setActiveSection] = useState('home');
 
@@ -55,14 +57,13 @@ export default function Navbar() {
                         const targetId = link.href.slice(1);
                         const isActive = activeSection === targetId;
                         return (
-                            <a 
-                                key={link.name} 
-                                href={link.href} 
-                                className={`transition-all duration-200 text-sm relative py-1 ${
-                                    isActive 
-                                        ? 'text-red-500 font-bold' 
+                            <a
+                                key={link.name}
+                                href={link.href}
+                                className={`transition-all duration-200 text-sm relative py-1 ${isActive
+                                        ? 'text-red-500 font-bold'
                                         : 'text-slate-600 font-medium hover:text-red-500'
-                                }`}
+                                    }`}
                             >
                                 {link.name}
                                 {isActive && (
@@ -74,17 +75,28 @@ export default function Navbar() {
                 </div>
 
                 <div className='hidden items-center gap-3 md:flex'>
-                    <Link to='/app?state=register' className='rounded-full bg-gradient-to-r from-[#e52d27] to-[#b31217] px-6 py-2 font-semibold text-white text-sm transition hover:opacity-90 hover:shadow-lg hover:shadow-red-500/10 cursor-pointer'>
-                        Get Start
-                    </Link>
-                    <Link to='/app?state=login' className='rounded-full border-2 border-red-500/80 px-6 py-1.5 font-semibold text-red-500 text-sm transition hover:bg-red-50 cursor-pointer'>
-                        Login
-                    </Link>
+                    {!user ? (
+                        <>
+                            <Link to='/app?state=register' className='rounded-full bg-gradient-to-r from-[#e52d27] to-[#b31217] px-6 py-2 font-semibold text-white text-sm transition hover:opacity-90 hover:shadow-lg hover:shadow-red-500/10 cursor-pointer'>
+                                Get Start
+                            </Link>
+                            <Link to='/app?state=login' className='rounded-full border-2 border-red-500/80 px-6 py-1.5 font-semibold text-red-500 text-sm transition hover:bg-red-50 cursor-pointer'>
+                                Login
+                            </Link>
+                        </>
+                    ) : (
+                        <Link 
+                            to="/app" 
+                            className="flex items-center justify-center gap-2 bg-gradient-to-r from-[#e52d27] to-[#b31217] text-white font-bold px-6 py-2 rounded-full hover:shadow-xl hover:shadow-red-500/20 hover:scale-[1.02] active:scale-95 transition-all duration-200 cursor-pointer text-sm"
+                        >
+                            Dashboard <ArrowRightIcon className="size-3.5" />
+                        </Link>
+                    )}
                 </div>
 
-                <button onClick={() => setIsOpen(true)} className='transition active:scale-90 md:hidden p-1 text-slate-700'>
-                    <MenuIcon className='size-6' />
-                </button>
+                    <button onClick={() => setIsOpen(true)} className='transition active:scale-90 md:hidden p-1 text-slate-700'>
+                        <MenuIcon className='size-6' />
+                    </button>
             </nav>
 
             {/* Mobile Navigation Backdrop & Drawer */}
@@ -109,14 +121,13 @@ export default function Navbar() {
                                 const targetId = link.href.slice(1);
                                 const isActive = activeSection === targetId;
                                 return (
-                                    <a 
-                                        key={link.name} 
-                                        href={link.href} 
-                                        className={`px-4 py-3 rounded-xl font-semibold text-base transition duration-150 ${
-                                            isActive 
-                                                ? 'bg-red-50 text-red-500' 
+                                    <a
+                                        key={link.name}
+                                        href={link.href}
+                                        className={`px-4 py-3 rounded-xl font-semibold text-base transition duration-150 ${isActive
+                                                ? 'bg-red-50 text-red-500'
                                                 : 'text-slate-700 hover:bg-slate-50 hover:text-red-500'
-                                        }`} 
+                                            }`}
                                         onClick={() => setIsOpen(false)}
                                     >
                                         {link.name}
@@ -128,20 +139,32 @@ export default function Navbar() {
 
                     {/* Action Buttons */}
                     <div className="flex flex-col gap-3 pt-6 border-t border-slate-100">
-                        <Link 
-                            to='/app?state=login' 
-                            className='w-full text-center rounded-full border border-red-500/80 py-2.5 font-bold text-red-500 text-sm transition hover:bg-red-50'
-                            onClick={() => setIsOpen(false)}
-                        >
-                            Login
-                        </Link>
-                        <Link 
-                            to='/app?state=register' 
-                            className='w-full text-center rounded-full bg-gradient-to-r from-[#e52d27] to-[#b31217] py-2.5 font-bold text-white text-sm transition hover:opacity-95 hover:shadow-lg hover:shadow-red-500/10'
-                            onClick={() => setIsOpen(false)}
-                        >
-                            Get Start
-                        </Link>
+                        {!user ? (
+                            <>
+                                <Link
+                                    to='/app?state=login'
+                                    className='w-full text-center rounded-full border border-red-500/80 py-2.5 font-bold text-red-500 text-sm transition hover:bg-red-50'
+                                    onClick={() => setIsOpen(false)}
+                                >
+                                    Login
+                                </Link>
+                                <Link
+                                    to='/app?state=register'
+                                    className='w-full text-center rounded-full bg-gradient-to-r from-[#e52d27] to-[#b31217] py-2.5 font-bold text-white text-sm transition hover:opacity-95 hover:shadow-lg hover:shadow-red-500/10'
+                                    onClick={() => setIsOpen(false)}
+                                >
+                                    Get Start
+                                </Link>
+                            </>
+                        ) : (
+                            <Link
+                                to='/app'
+                                className='w-full flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#e52d27] to-[#b31217] py-2.5 font-bold text-white text-sm transition hover:opacity-95 hover:shadow-lg hover:shadow-red-500/10'
+                                onClick={() => setIsOpen(false)}
+                            >
+                                Dashboard <ArrowRightIcon className="size-3.5" />
+                            </Link>
+                        )}
                     </div>
                 </div>
             </div>
