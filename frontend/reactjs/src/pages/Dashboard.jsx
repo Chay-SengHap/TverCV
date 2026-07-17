@@ -337,7 +337,7 @@ const Dashboard = () => {
           <div className="bg-white border border-slate-200/60 rounded-2xl p-5 shadow-sm flex items-center justify-between">
             <div>
               <p className="text-xs font-medium uppercase tracking-wider text-slate-400">Documents</p>
-              <h3 className="text-2xl font-semibold text-slate-800 mt-1">{allResumes.length}</h3>
+              <h3 className="text-2xl font-normal text-slate-800 mt-1">{allResumes.length}</h3>
             </div>
             <div className="p-3 bg-slate-100 text-black rounded-xl">
               <FileText className="size-6" />
@@ -347,7 +347,7 @@ const Dashboard = () => {
           <div className="bg-white border border-slate-200/60 rounded-2xl p-5 shadow-sm flex items-center justify-between">
             <div>
               <p className="text-xs font-medium uppercase tracking-wider text-slate-400">Public Links</p>
-              <h3 className="text-2xl font-semibold text-slate-800 mt-1">{publicCount}</h3>
+              <h3 className="text-2xl font-normal text-slate-800 mt-1">{publicCount}</h3>
             </div>
             <div className="p-3 bg-slate-100 text-black rounded-xl">
               <Globe className="size-6" />
@@ -357,7 +357,7 @@ const Dashboard = () => {
           <div className="bg-white border border-slate-200/60 rounded-2xl p-5 shadow-sm flex items-center justify-between">
             <div>
               <p className="text-xs font-medium uppercase tracking-wider text-slate-400">Private Drafts</p>
-              <h3 className="text-2xl font-semibold text-slate-800 mt-1">{privateCount}</h3>
+              <h3 className="text-2xl font-normal text-slate-800 mt-1">{privateCount}</h3>
             </div>
             <div className="p-3 bg-slate-100 text-black rounded-xl">
               <Lock className="size-6" />

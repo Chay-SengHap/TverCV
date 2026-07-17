@@ -1,5 +1,6 @@
 import { Check, Layout, X } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import ResumePreview from './ResumePreview';
 
 const dummyResumeData = {
@@ -25,17 +26,17 @@ const dummyResumeData = {
     }
   ],
   education: [
-    { 
-      degree: "M.S.", 
-      field: "Software Engineering", 
-      institution: "Stanford University", 
-      graduation_date: "2020-05" 
+    {
+      degree: "M.S.",
+      field: "Software Engineering",
+      institution: "Stanford University",
+      graduation_date: "2020-05"
     }
   ],
   project: [
-    { 
-      name: "AI-Powered CV Platform", 
-      description: "Developed a full-stack resume builder integrating generative AI models to analyze, parse, and suggest structural optimization tips for uploaded PDF documents." 
+    {
+      name: "AI-Powered CV Platform",
+      description: "Developed a full-stack resume builder integrating generative AI models to analyze, parse, and suggest structural optimization tips for uploaded PDF documents."
     }
   ],
   skills: [
@@ -71,7 +72,7 @@ const TemplateSelector = ({ selectedTemplate, onChange }) => {
 
   return (
     <div>
-      <button 
+      <button
         onClick={() => setIsOpen(true)}
         className='flex items-center gap-1.5 text-xs text-blue-600 bg-gradient-to-br from-blue-50 to-blue-100 ring-blue-300 hover:ring transition-all px-3 py-2 rounded-lg font-semibold'
       >
@@ -79,10 +80,10 @@ const TemplateSelector = ({ selectedTemplate, onChange }) => {
         <span>Template</span>
       </button>
 
-      {isOpen && (
-        <div 
+      {isOpen && createPortal(
+        <div
           onClick={() => setIsOpen(false)}
-          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all duration-300"
+          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 transition-all duration-300"
         >
           <div
             data-lenis-prevent
@@ -113,15 +114,22 @@ const TemplateSelector = ({ selectedTemplate, onChange }) => {
                     onChange(tpl.id);
                     setIsOpen(false);
                   }}
-                  className={`group relative p-2.5 rounded-xl border-2 transition-all cursor-pointer flex flex-col justify-between h-56 ${
-                    selectedTemplate === tpl.id
-                      ? 'border-blue-500 bg-blue-50/20 shadow-md ring-2 ring-blue-500/10'
-                      : 'border-slate-200 hover:border-slate-300 hover:shadow bg-white'
-                  }`}
+                  className={`group relative p-2.5 rounded-xl border-2 transition-all cursor-pointer flex flex-col justify-between h-56 ${selectedTemplate === tpl.id
+                    ? 'border-blue-500 bg-blue-50/20 shadow-md ring-2 ring-blue-500/10'
+                    : 'border-slate-200 hover:border-slate-300 hover:shadow bg-white'
+                    }`}
                 >
+                  {/* Template Label */}
+                  <div className="mt-1 flex items-center justify-between z-10 relative">
+                    <span className="text-[11px] font-bold text-slate-700 truncate mr-1">{tpl.name}</span>
+                    {selectedTemplate === tpl.id && (
+                      <span className="size-2 rounded-full bg-blue-500 flex-shrink-0" />
+                    )}
+                  </div>
+
                   {/* Live Template Preview Area */}
-                  <div className="w-full h-40 rounded-lg shadow-sm overflow-hidden flex items-start justify-center bg-slate-50 border border-slate-100 relative group/preview">
-                    <div className="w-full h-full pointer-events-none">
+                  <div className="absolute inset-0 mt-8 mb-6 mx-2 rounded-lg shadow-sm overflow-hidden flex items-start justify-center bg-slate-50 border border-slate-100 group/preview pointer-events-none">
+                    <div className="absolute inset-0 pointer-events-none overflow-hidden">
                       <ResumePreview
                         data={dummyResumeData}
                         template={tpl.id}
@@ -130,19 +138,12 @@ const TemplateSelector = ({ selectedTemplate, onChange }) => {
                       />
                     </div>
                   </div>
-
-                  {/* Template Label */}
-                  <div className="mt-1 flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-slate-700 truncate mr-1">{tpl.name}</span>
-                    {selectedTemplate === tpl.id && (
-                      <span className="size-2 rounded-full bg-blue-500 flex-shrink-0" />
-                    )}
-                  </div>
                 </div>
               ))}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

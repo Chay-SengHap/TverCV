@@ -135,7 +135,7 @@ const ResumeBuilder = () => {
 
   const handleSaveAndLeave = async () => {
     setShowBackConfirmModal(false);
-    
+
     await toast.promise(
       (async () => {
         const success = await saveResume();
@@ -332,8 +332,8 @@ const ResumeBuilder = () => {
                 style={{ width: `${activeSectionIndex * 100 / (sections.length - 1)}%` }} />
 
               {/* Section Navigation */}
-              <div className="sticky top-[58px] lg:top-0 z-20 bg-white py-2 flex justify-between items-center mb-6 border-b border-gray-300">
-                <div className=' flex items-center gap-2'>
+              <div className="sticky top-[58px] lg:top-0 z-20 bg-white py-2 flex flex-wrap justify-between items-center mb-6 border-b border-gray-300 gap-y-3">
+                <div className='flex flex-wrap items-center gap-2'>
                   <TemplateSelector
                     selectedTemplate={resumeData.template}
                     onChange={(template) => setResumeData(prev => ({ ...prev, template }))}
